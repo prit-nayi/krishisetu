@@ -1,0 +1,63 @@
+/**
+ * global.module.css — CSS reset and base variables
+ * No Tailwind. All styles are CSS Modules.
+ */
+
+:root {
+  --color-primary: #2e7d32;
+  --color-primary-light: #4caf50;
+  --color-secondary: #f57f17;
+  --color-bg: #f9fafb;
+  --color-surface: #ffffff;
+  --color-border: #e0e0e0;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b7280;
+  --color-error: #d32f2f;
+  --color-success: #388e3c;
+  --color-warning: #f57f17;
+
+  --font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-size-base: 15px;
+  --line-height: 1.6;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+}
