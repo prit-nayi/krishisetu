@@ -1,0 +1,1 @@
+import{j as s}from"./index-Dw5PfXFZ.js";function r(){return s.jsxs("div",{style:{padding:"2rem"},children:[s.jsx("h1",{children:"My Crop Lots"}),s.jsx("p",{children:"Phase 2 — coming soon."})]})}export{r as default};

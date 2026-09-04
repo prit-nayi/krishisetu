@@ -1,0 +1,1 @@
+import{j as e}from"./index-Dw5PfXFZ.js";function o(){return e.jsxs("div",{style:{padding:"2rem"},children:[e.jsx("h1",{children:"Add Crop Lot"}),e.jsx("p",{children:"Phase 2 — coming soon."})]})}export{o as default};

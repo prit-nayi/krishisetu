@@ -1,0 +1,1 @@
+import{j as s}from"./index-Dw5PfXFZ.js";function e(){return s.jsxs("div",{style:{padding:"2rem"},children:[s.jsx("h1",{children:"Analysis"}),s.jsx("p",{children:"Phase 8 — coming soon."})]})}export{e as default};
