@@ -1,1 +1,0 @@
-"""accounts URL packages"""

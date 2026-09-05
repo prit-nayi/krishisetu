@@ -1,19 +1,15 @@
-"""
-forecasting/views.py — Forecast API stub (full implementation in Phase 5).
-"""
 from rest_framework import generics, permissions
-
 from .models import Forecast
 from .serializers import ForecastSerializer
 
-
 class ForecastListView(generics.ListAPIView):
-    """GET /api/v1/forecast/?commodity=groundnut&market=1"""
-
-    serializer_class = ForecastSerializer
+    """GET /api/v1/forecast/?commodity=groundnut"""
+    serializer_class   = ForecastSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ["commodity", "market"]
-    ordering = ["-forecast_date"]
 
     def get_queryset(self):
-        return Forecast.objects.select_related("market").all()
+        qs = Forecast.objects.all()
+        commodity = self.request.query_params.get("commodity")
+        if commodity:
+            qs = qs.filter(commodity__iexact=commodity)
+        return qs.order_by("-forecast_date")[:50]

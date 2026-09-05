@@ -5,32 +5,35 @@ import logging
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("krishilink")
 
 
 def krishilink_exception_handler(exc, context):
-    """Custom exception handler that returns consistent JSON error envelopes."""
+    """
+    Custom DRF exception handler that wraps all errors in a consistent shape:
+    {
+        "error": true,
+        "detail": "...",
+        "errors": { field: [messages] }   # optional, for validation errors
+    }
+    """
     response = exception_handler(exc, context)
 
     if response is not None:
-        response.data = {
-            "success": False,
-            "error": {
-                "status_code": response.status_code,
-                "detail": response.data,
-            },
-        }
-    else:
-        logger.exception("Unhandled exception in view: %s", exc)
-        response = Response(
-            {
-                "success": False,
-                "error": {
-                    "status_code": 500,
-                    "detail": "An unexpected error occurred.",
-                },
-            },
-            status=500,
-        )
+        data = {"error": True}
+
+        if isinstance(response.data, dict):
+            if "detail" in response.data:
+                data["detail"] = str(response.data["detail"])
+            else:
+                data["detail"] = "Validation error."
+                data["errors"] = response.data
+        elif isinstance(response.data, list):
+            data["detail"] = "Validation error."
+            data["errors"] = response.data
+        else:
+            data["detail"] = str(response.data)
+
+        response.data = data
 
     return response

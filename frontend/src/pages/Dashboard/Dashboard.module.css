@@ -1,0 +1,104 @@
+/**
+ * Dashboard.module.css
+ */
+.page { min-height: 100vh; background: var(--clr-bg); display: flex; flex-direction: column; }
+
+.nav {
+  background: var(--clr-surface); border-bottom: 1px solid var(--clr-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--sp-6); height: 58px;
+  position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm);
+}
+.navBrand { display: flex; align-items: center; gap: var(--sp-3); }
+.navLogo  { font-size: 1.4rem; line-height: 1; }
+.navTitle { font-size: var(--font-size-md); font-weight: 700; color: var(--clr-primary-dark); letter-spacing: -0.2px; }
+.navActions { display: flex; align-items: center; gap: var(--sp-2); }
+.navLink {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--radius);
+  font-size: var(--font-size-sm); font-weight: 500; color: var(--clr-text-muted);
+  text-decoration: none; transition: background var(--transition), color var(--transition);
+}
+.navLink:hover { background: var(--clr-primary-tint); color: var(--clr-primary); text-decoration: none; }
+.navLogout {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--radius);
+  font-size: var(--font-size-sm); font-weight: 500; color: var(--clr-text-muted);
+  background: none; border: none; cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.navLogout:hover { background: var(--clr-error-tint); color: var(--clr-error); }
+
+.main {
+  max-width: 800px; width: 100%; margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6) var(--sp-16);
+  display: flex; flex-direction: column; gap: var(--sp-8);
+}
+
+/* Welcome banner */
+.welcome {
+  background: linear-gradient(135deg, var(--clr-primary) 0%, #43a047 100%);
+  border-radius: var(--radius-lg); padding: var(--sp-8);
+  color: var(--clr-text-inverse);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6);
+  overflow: hidden; position: relative;
+}
+.welcome::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+.welcomeGreeting  { font-size: var(--font-size-sm); opacity: 0.85; font-weight: 500; }
+.welcomeHeading   { font-size: var(--font-size-3xl); font-weight: 700; margin: var(--sp-1) 0; line-height: 1.2; }
+.welcomeSub       { font-size: var(--font-size-sm); opacity: 0.85; max-width: 420px; line-height: 1.5; }
+.welcomeIllustration { font-size: 4rem; flex-shrink: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15)); }
+
+/* Sections */
+.section { display: flex; flex-direction: column; gap: var(--sp-4); }
+.sectionHeading { font-size: var(--font-size-lg); font-weight: 600; color: var(--clr-text); }
+
+/* Action cards */
+.actionGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+.actionCard {
+  display: flex; align-items: center; gap: var(--sp-4);
+  padding: var(--sp-5); background: var(--clr-surface);
+  border: 1.5px solid var(--clr-border); border-radius: var(--radius-md);
+  text-decoration: none; color: var(--clr-text);
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+.actionCard:hover { border-color: var(--clr-primary); box-shadow: var(--shadow-md); transform: translateY(-1px); text-decoration: none; color: var(--clr-text); }
+.actionCardPrimary { border-color: var(--clr-primary); background: var(--clr-primary-tint); }
+.actionCardPrimary:hover { background: #dcedc8; }
+.actionIcon {
+  width: 40px; height: 40px; border-radius: var(--radius);
+  background: var(--clr-primary-tint); color: var(--clr-primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.actionCardPrimary .actionIcon { background: rgba(46,125,50,0.15); color: var(--clr-primary-dark); }
+.actionText  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.actionTitle { font-size: var(--font-size-base); font-weight: 600; color: var(--clr-text); }
+.actionDesc  { font-size: var(--font-size-xs); color: var(--clr-text-muted); line-height: 1.4; }
+.actionChevron { color: var(--clr-text-muted); flex-shrink: 0; }
+
+/* Phase notice */
+.phaseNotice { background: var(--clr-secondary-tint); border: 1px solid rgba(230,81,0,0.2); border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-5); }
+.phaseNoticeInner { display: flex; align-items: flex-start; gap: var(--sp-3); font-size: var(--font-size-sm); color: var(--clr-text); line-height: 1.5; }
+.phaseTag { background: var(--clr-secondary); color: #fff; font-size: var(--font-size-xs); font-weight: 700; padding: 2px 10px; border-radius: var(--radius-full); white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+
+/* Account card */
+.accountCard { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-5); background: var(--clr-surface); border: 1.5px solid var(--clr-border); border-radius: var(--radius-md); }
+.accountAvatar { width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--clr-primary-tint); color: var(--clr-primary-dark); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.accountInfo  { flex: 1; }
+.accountName  { font-weight: 600; font-size: var(--font-size-base); color: var(--clr-text); }
+.accountEmail { font-size: var(--font-size-sm); color: var(--clr-text-muted); margin-top: 2px; }
+.roleBadge    { background: var(--clr-primary-tint); color: var(--clr-primary-dark); font-size: var(--font-size-xs); font-weight: 600; padding: 3px 10px; border-radius: var(--radius-full); text-transform: capitalize; }
+
+@media (max-width: 640px) {
+  .main { padding: var(--sp-5) var(--sp-4) var(--sp-12); }
+  .welcome { padding: var(--sp-6); flex-direction: column; text-align: center; }
+  .welcomeHeading { font-size: var(--font-size-2xl); }
+  .welcomeIllustration { font-size: 3rem; }
+  .actionGrid { grid-template-columns: 1fr; }
+  .nav { padding: 0 var(--sp-4); }
+  .navTitle { display: none; }
+}

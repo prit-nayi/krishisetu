@@ -1,70 +1,78 @@
 """
-agents/granite_client.py — IBM Granite (watsonx.ai) client stub.
-Full implementation in Phase 7.
+agents/granite_client.py — IBM Granite client stub with fallback.
+
+In Phase 7, this will be wired to IBM watsonx.ai.
+Until then, the fallback template explanation is used.
 """
 import logging
 from django.conf import settings
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("krishilink")
 
 
 class GraniteClient:
-    """
-    Thin wrapper around IBM watsonx.ai Granite model.
-    Provides a single generate() method.
-    Falls back to a template explanation when the API is unavailable.
-    """
+    """Wrapper around IBM watsonx.ai Granite model for generating farmer-friendly explanations."""
+
+    FALLBACK_TEMPLATE = (
+        "Based on current market data, the recommendation for your {commodity} lot "
+        "({quantity} {unit}) is to {action}. "
+        "Current net value: ₹{current_net_value:,.0f}. "
+        "Expected future net value: ₹{expected_future_net_value:,.0f}. "
+        "Key factors: {factors}."
+    )
 
     def __init__(self):
-        self.api_key = settings.IBM_WATSONX_API_KEY
-        self.url = settings.IBM_WATSONX_URL
-        self.project_id = settings.IBM_WATSONX_PROJECT_ID
-        self.model_id = settings.IBM_GRANITE_MODEL_ID
-        self._client = None
+        self.api_key    = getattr(settings, "IBM_WATSONX_API_KEY",    "")
+        self.url        = getattr(settings, "IBM_WATSONX_URL",        "")
+        self.project_id = getattr(settings, "IBM_WATSONX_PROJECT_ID", "")
+        self.model_id   = getattr(settings, "IBM_GRANITE_MODEL_ID",   "ibm/granite-13b-instruct-v2")
+        self._client    = None
 
-    def _get_client(self):
-        """Lazily initialise the watsonx.ai client."""
-        if not self._client:
-            if not self.api_key or not self.url:
-                return None
-            try:
-                from ibm_watsonx_ai import APIClient, Credentials
-                credentials = Credentials(url=self.url, api_key=self.api_key)
-                self._client = APIClient(credentials)
-            except Exception as exc:
-                logger.warning("Could not initialise Granite client: %s", exc)
-                return None
-        return self._client
+    @property
+    def is_configured(self):
+        return bool(self.api_key and self.url and self.project_id)
 
-    def generate(self, prompt: str, language: str = "english") -> str:
+    def generate_explanation(self, context: dict, language: str = "english") -> dict:
         """
-        Generate a farmer-friendly explanation from a structured prompt.
-        Returns a fallback message if Granite is unavailable.
+        Generate a natural-language explanation of a SELL/HOLD/PARTIAL_SELL recommendation.
+
+        Args:
+            context: Structured JSON bundle from the orchestrator.
+            language: "english" | "gujarati" | "hindi"
+
+        Returns:
+            {"explanation": str, "source": "granite" | "fallback", "language": str}
         """
-        client = self._get_client()
-        if not client:
-            return self._fallback_explanation(language)
+        if not self.is_configured:
+            return self._fallback_explanation(context, language)
 
         try:
-            from ibm_watsonx_ai.foundation_models import ModelInference
-            model = ModelInference(
-                model_id=self.model_id,
-                project_id=self.project_id,
-                api_client=client,
-            )
-            response = model.generate_text(prompt=prompt)
-            return response
+            return self._call_granite(context, language)
         except Exception as exc:
-            logger.error("Granite generation failed: %s", exc)
-            return self._fallback_explanation(language)
+            logger.warning("Granite API call failed, using fallback: %s", exc)
+            return self._fallback_explanation(context, language)
 
-    def _fallback_explanation(self, language: str) -> str:
-        messages = {
-            "gujarati": "AI સ્પષ્ટીકરણ હાલ ઉપલબ્ધ નથી. કૃપા કરીને ભલામણ કાર્ડ જુઓ.",
-            "hindi": "AI स्पष्टीकरण अभी उपलब्ध नहीं है। कृपया अनुशंसा कार्ड देखें।",
-            "english": (
-                "AI explanation is temporarily unavailable. "
-                "Please refer to the recommendation card for details."
-            ),
-        }
-        return messages.get(language, messages["english"])
+    def _call_granite(self, context: dict, language: str) -> dict:
+        """Make actual watsonx.ai API call. Implemented in Phase 7."""
+        raise NotImplementedError("Granite API integration implemented in Phase 7.")
+
+    def _fallback_explanation(self, context: dict, language: str) -> dict:
+        """Return a deterministic template-based explanation."""
+        crop    = context.get("crop_lot", {})
+        rec     = context.get("recommendation", {})
+        factors = context.get("reasoning_factors", [])
+
+        explanation = self.FALLBACK_TEMPLATE.format(
+            commodity=crop.get("commodity", "crop"),
+            quantity=crop.get("quantity", ""),
+            unit=crop.get("unit", "quintal"),
+            action=rec.get("action", "SELL_NOW").replace("_", " ").title(),
+            current_net_value=float(rec.get("current_net_value", 0)),
+            expected_future_net_value=float(rec.get("expected_future_net_value", 0)),
+            factors=", ".join(factors) if factors else "market analysis",
+        )
+        return {"explanation": explanation, "source": "fallback", "language": language}
+
+
+# Singleton instance
+granite_client = GraniteClient()

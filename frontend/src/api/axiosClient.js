@@ -1,5 +1,5 @@
 /**
- * api/axiosClient.js — Axios instance with JWT header injection.
+ * api/axiosClient.js — Axios instance with JWT header injection and auto-refresh.
  */
 import axios from 'axios'
 
