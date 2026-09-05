@@ -1,4 +1,366 @@
-import React from 'react'
+/**
+ * CropLotCreatePage.jsx — Form to add a new crop lot.
+ */
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '../../context/AuthContext'
+import { createCropLot, parseApiError } from '../../api/cropLots'
+import styles from './CropLot.module.css'
+
+/* ── Icons ────────────────────────────────────────────────────────────────── */
+const IconBack   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+const IconUser   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+const IconLogout = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+
+/* ── Field constants ──────────────────────────────────────────────────────── */
+const COMMODITY_OPTIONS = [
+  { value: '', label: 'Select commodity…' },
+  { value: 'cotton',    label: 'Cotton' },
+  { value: 'groundnut', label: 'Groundnut' },
+]
+
+const UNIT_OPTIONS = [
+  { value: 'quintal', label: 'Quintal' },
+  { value: 'kg',      label: 'Kilogram' },
+  { value: 'tonne',   label: 'Tonne' },
+]
+
+const QUALITY_OPTIONS = [
+  { value: '', label: 'Not specified' },
+  { value: 'A', label: 'Grade A – Premium' },
+  { value: 'B', label: 'Grade B – Standard' },
+  { value: 'C', label: 'Grade C – Below Standard' },
+]
+
+const STORAGE_OPTIONS = [
+  { value: 'farm',         label: 'At Farm' },
+  { value: 'warehouse',    label: 'Warehouse' },
+  { value: 'cold_storage', label: 'Cold Storage' },
+]
+
+/* ── Validation ───────────────────────────────────────────────────────────── */
+function validate(form) {
+  const errors = {}
+  if (!form.commodity)      errors.commodity = 'Please select a commodity.'
+  if (!form.quantity)       errors.quantity  = 'Quantity is required.'
+  else if (Number(form.quantity) <= 0) errors.quantity = 'Quantity must be greater than zero.'
+  if (!form.harvest_date)   errors.harvest_date = 'Harvest date is required.'
+  if (form.moisture_percent !== '' && Number(form.moisture_percent) > 100)
+    errors.moisture_percent = 'Must be between 0 and 100.'
+  if (form.moisture_percent !== '' && Number(form.moisture_percent) < 0)
+    errors.moisture_percent = 'Must be between 0 and 100.'
+  return errors
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
 export default function CropLotCreatePage() {
-  return <div style={{padding:'2rem'}}><h1>Add Crop Lot</h1><p>Phase 2 — coming soon.</p></div>
+  const { logout } = useAuth()
+  const navigate   = useNavigate()
+  const queryClient = useQueryClient()
+
+  const [form, setForm] = useState({
+    commodity:        '',
+    variety:          '',
+    quantity:         '',
+    unit:             'quintal',
+    moisture_percent: '',
+    quality_grade:    '',
+    harvest_date:     '',
+    storage_status:   'farm',
+    storage_start_date: '',
+    notes:            '',
+  })
+
+  const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState('')
+
+  const mutation = useMutation({
+    mutationFn: createCropLot,
+    onSuccess: (created) => {
+      queryClient.invalidateQueries({ queryKey: ['cropLots'] })
+      navigate('/crop-lots', { state: { created: true } })
+    },
+    onError: (err) => {
+      setServerError(parseApiError(err))
+    },
+  })
+
+  function handleChange(e) {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }))
+    setServerError('')
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    const validationErrors = validate(form)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
+    // Build clean payload — omit empty optional strings
+    const payload = {
+      commodity:      form.commodity,
+      quantity:       form.quantity,
+      unit:           form.unit,
+      harvest_date:   form.harvest_date,
+      storage_status: form.storage_status,
+    }
+    if (form.variety)           payload.variety           = form.variety
+    if (form.moisture_percent)  payload.moisture_percent  = form.moisture_percent
+    if (form.quality_grade)     payload.quality_grade     = form.quality_grade
+    if (form.storage_start_date) payload.storage_start_date = form.storage_start_date
+    if (form.notes)             payload.notes             = form.notes
+
+    mutation.mutate(payload)
+  }
+
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
+  const isBusy = mutation.isPending
+
+  return (
+    <div className={styles.page}>
+      {/* Nav */}
+      <nav className={styles.nav}>
+        <Link to="/dashboard" className={styles.navBrand}>
+          <span className={styles.navLogo} aria-hidden="true">🌾</span>
+          KrishiLink AI
+        </Link>
+        <div className={styles.navActions}>
+          <Link to="/farmer/profile" className={styles.navLink}><IconUser /> Profile</Link>
+          <button onClick={handleLogout} className={styles.navLogout} aria-label="Log out">
+            <IconLogout /> Log out
+          </button>
+        </div>
+      </nav>
+
+      <main className={styles.main}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerText}>
+            <h1>Add Crop Lot</h1>
+            <p>Enter details about your cotton or groundnut lot</p>
+          </div>
+          <Link to="/crop-lots" className={styles.btnSecondary}>
+            <IconBack /> Back to lots
+          </Link>
+        </div>
+
+        <div className={styles.formCard}>
+          {serverError && (
+            <div className={`${styles.alert} ${styles.alertError}`} role="alert">
+              {serverError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate>
+            <div className={styles.formGrid}>
+
+              {/* Commodity */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="commodity">
+                  Commodity <span style={{ color: 'var(--clr-error)' }}>*</span>
+                </label>
+                <select
+                  id="commodity"
+                  name="commodity"
+                  value={form.commodity}
+                  onChange={handleChange}
+                  className={`${styles.select}${errors.commodity ? ' ' + styles.inputError : ''}`}
+                  disabled={isBusy}
+                >
+                  {COMMODITY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value} disabled={o.value === ''}>{o.label}</option>
+                  ))}
+                </select>
+                {errors.commodity && <span className={styles.fieldError}>{errors.commodity}</span>}
+              </div>
+
+              {/* Variety */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="variety">
+                  Variety <span className={styles.labelOptional}>(optional)</span>
+                </label>
+                <input
+                  id="variety"
+                  name="variety"
+                  type="text"
+                  placeholder="e.g. Shankar-6, Bold"
+                  value={form.variety}
+                  onChange={handleChange}
+                  className={styles.input}
+                  disabled={isBusy}
+                />
+              </div>
+
+              {/* Quantity */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="quantity">
+                  Quantity <span style={{ color: 'var(--clr-error)' }}>*</span>
+                </label>
+                <input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="e.g. 40"
+                  value={form.quantity}
+                  onChange={handleChange}
+                  className={`${styles.input}${errors.quantity ? ' ' + styles.inputError : ''}`}
+                  disabled={isBusy}
+                />
+                {errors.quantity && <span className={styles.fieldError}>{errors.quantity}</span>}
+              </div>
+
+              {/* Unit */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="unit">Unit</label>
+                <select
+                  id="unit"
+                  name="unit"
+                  value={form.unit}
+                  onChange={handleChange}
+                  className={styles.select}
+                  disabled={isBusy}
+                >
+                  {UNIT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Harvest date */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="harvest_date">
+                  Harvest Date <span style={{ color: 'var(--clr-error)' }}>*</span>
+                </label>
+                <input
+                  id="harvest_date"
+                  name="harvest_date"
+                  type="date"
+                  value={form.harvest_date}
+                  onChange={handleChange}
+                  max={new Date().toISOString().split('T')[0]}
+                  className={`${styles.input}${errors.harvest_date ? ' ' + styles.inputError : ''}`}
+                  disabled={isBusy}
+                />
+                {errors.harvest_date && <span className={styles.fieldError}>{errors.harvest_date}</span>}
+              </div>
+
+              {/* Moisture */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="moisture_percent">
+                  Moisture % <span className={styles.labelOptional}>(optional)</span>
+                </label>
+                <input
+                  id="moisture_percent"
+                  name="moisture_percent"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  placeholder="e.g. 8.5"
+                  value={form.moisture_percent}
+                  onChange={handleChange}
+                  className={`${styles.input}${errors.moisture_percent ? ' ' + styles.inputError : ''}`}
+                  disabled={isBusy}
+                />
+                {errors.moisture_percent && (
+                  <span className={styles.fieldError}>{errors.moisture_percent}</span>
+                )}
+              </div>
+
+              {/* Quality grade */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="quality_grade">
+                  Quality Grade <span className={styles.labelOptional}>(optional)</span>
+                </label>
+                <select
+                  id="quality_grade"
+                  name="quality_grade"
+                  value={form.quality_grade}
+                  onChange={handleChange}
+                  className={styles.select}
+                  disabled={isBusy}
+                >
+                  {QUALITY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Storage status */}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="storage_status">Storage Status</label>
+                <select
+                  id="storage_status"
+                  name="storage_status"
+                  value={form.storage_status}
+                  onChange={handleChange}
+                  className={styles.select}
+                  disabled={isBusy}
+                >
+                  {STORAGE_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Storage start date — only if not farm */}
+              {form.storage_status !== 'farm' && (
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="storage_start_date">
+                    In Storage Since <span className={styles.labelOptional}>(optional)</span>
+                  </label>
+                  <input
+                    id="storage_start_date"
+                    name="storage_start_date"
+                    type="date"
+                    value={form.storage_start_date}
+                    onChange={handleChange}
+                    max={new Date().toISOString().split('T')[0]}
+                    className={styles.input}
+                    disabled={isBusy}
+                  />
+                </div>
+              )}
+
+              {/* Notes */}
+              <div className={`${styles.field} ${styles.formGridFull}`}>
+                <label className={styles.label} htmlFor="notes">
+                  Notes <span className={styles.labelOptional}>(optional)</span>
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  placeholder="Any additional details about this lot…"
+                  value={form.notes}
+                  onChange={handleChange}
+                  className={styles.textarea}
+                  disabled={isBusy}
+                />
+              </div>
+            </div>
+
+            <div className={styles.formActions}>
+              <Link to="/crop-lots" className={styles.btnSecondary}>Cancel</Link>
+              <button type="submit" className={styles.btnPrimary} disabled={isBusy}>
+                {isBusy
+                  ? <><span className={styles.spinner} aria-hidden="true" /> Saving…</>
+                  : 'Save crop lot'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  )
 }

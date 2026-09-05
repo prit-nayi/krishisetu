@@ -95,12 +95,12 @@ export default function DashboardPage() {
         </section>
 
         {/* Phase notice */}
-        <section className={styles.phaseNotice}>
+        {/* <section className={styles.phaseNotice}>
           <div className={styles.phaseNoticeInner}>
             <span className={styles.phaseTag}>Phase 1 ✓</span>
             <p>Authentication is live. <strong>Crop lot analysis, market prices, and AI recommendations</strong> are coming in the next phases.</p>
           </div>
-        </section>
+        </section> */}
 
         {/* Account card */}
         <section className={styles.section}>

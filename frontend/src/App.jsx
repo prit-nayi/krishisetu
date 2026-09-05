@@ -12,6 +12,7 @@ const FarmerProfilePage = React.lazy(() => import('./pages/FarmerProfile/FarmerP
 const DashboardPage  = React.lazy(() => import('./pages/Dashboard/DashboardPage'))
 const CropLotListPage   = React.lazy(() => import('./pages/CropLot/CropLotListPage'))
 const CropLotCreatePage = React.lazy(() => import('./pages/CropLot/CropLotCreatePage'))
+const CropLotDetailPage = React.lazy(() => import('./pages/CropLot/CropLotDetailPage'))
 const AnalysisPage   = React.lazy(() => import('./pages/Analysis/AnalysisPage'))
 const MarketListPage = React.lazy(() => import('./pages/Market/MarketListPage'))
 
@@ -32,8 +33,9 @@ function App() {
             <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="/dashboard"       element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/farmer/profile"  element={<ProtectedRoute><FarmerProfilePage /></ProtectedRoute>} />
-            <Route path="/crop-lots"       element={<ProtectedRoute><CropLotListPage /></ProtectedRoute>} />
-            <Route path="/crop-lots/new"   element={<ProtectedRoute><CropLotCreatePage /></ProtectedRoute>} />
+            <Route path="/crop-lots"           element={<ProtectedRoute><CropLotListPage /></ProtectedRoute>} />
+            <Route path="/crop-lots/new"       element={<ProtectedRoute><CropLotCreatePage /></ProtectedRoute>} />
+            <Route path="/crop-lots/:id/edit"  element={<ProtectedRoute><CropLotDetailPage /></ProtectedRoute>} />
             <Route path="/analysis/:cropLotId" element={<ProtectedRoute><AnalysisPage /></ProtectedRoute>} />
             <Route path="/markets"         element={<ProtectedRoute><MarketListPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
