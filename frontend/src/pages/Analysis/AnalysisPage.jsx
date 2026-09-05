@@ -1,4 +1,4 @@
 import React from 'react'
 export default function AnalysisPage() {
-  return <div><h1>Analysis</h1><p>Phase 8 orchestrator implementation coming soon.</p></div>
+  return <div style={{padding:'2rem'}}><h1>Analysis</h1><p>Phase 8 — coming soon.</p></div>
 }

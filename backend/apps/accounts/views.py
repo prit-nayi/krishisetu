@@ -19,7 +19,7 @@ from .serializers import (
 class RegisterView(generics.CreateAPIView):
     """POST /api/v1/auth/register/ — create a new farmer user."""
 
-    serializer_class = UserRegistrationSerializer
+    serializer_class   = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
@@ -34,7 +34,6 @@ class RegisterView(generics.CreateAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """POST /api/v1/auth/login/ — obtain JWT pair."""
-
     serializer_class = CustomTokenObtainPairSerializer
 
 
@@ -58,7 +57,10 @@ class FarmerProfileView(generics.RetrieveUpdateAPIView):
         return FarmerProfileSerializer
 
     def get_object(self):
-        profile, _ = FarmerProfile.objects.get_or_create(user=self.request.user)
+        profile, _ = FarmerProfile.objects.get_or_create(
+            user=self.request.user,
+            defaults={"district": "", "village": ""},
+        )
         return profile
 
     def update(self, request, *args, **kwargs):

@@ -1,13 +1,8 @@
 """
-tests/test_financial_tools.py
-Unit tests for deterministic financial tools.
-These must pass before Phase 4 is considered complete.
+tests/test_financial_tools.py — Unit tests for deterministic financial tools.
 """
 import pytest
-import sys
-import os
-
-# Make sure backend/ is on the path for tool imports
+import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from tools.financial_tools import (
@@ -38,14 +33,12 @@ class TestCalculateMarketRevenue:
 
 class TestCalculateTransportCost:
     def test_basic(self):
-        result = calculate_transport_cost(
-            distance_km=30, quantity_quintal=40
-        )
-        assert result["total_transport_cost"] == pytest.approx(800.0)  # 30*40*0.5 + 200
+        result = calculate_transport_cost(distance_km=30, quantity_quintal=40)
+        assert result["total_transport_cost"] == pytest.approx(800.0)
 
     def test_zero_distance(self):
         result = calculate_transport_cost(distance_km=0, quantity_quintal=40)
-        assert result["total_transport_cost"] == 200.0  # only fixed cost
+        assert result["total_transport_cost"] == 200.0
 
     def test_negative_distance_raises(self):
         with pytest.raises(ValueError):
@@ -61,11 +54,11 @@ class TestCalculateNetValue:
 class TestCalculateStorageCost:
     def test_farm_storage(self):
         result = calculate_storage_cost("farm", days=14, quantity_quintal=40)
-        assert result["total_storage_cost"] == pytest.approx(56.0)  # 0.10 * 14 * 40
+        assert result["total_storage_cost"] == pytest.approx(56.0)
 
     def test_warehouse_storage(self):
         result = calculate_storage_cost("warehouse", days=14, quantity_quintal=40)
-        assert result["total_storage_cost"] == pytest.approx(336.0)  # 0.60 * 14 * 40
+        assert result["total_storage_cost"] == pytest.approx(336.0)
 
     def test_invalid_type_raises(self):
         with pytest.raises(ValueError):
@@ -74,31 +67,18 @@ class TestCalculateStorageCost:
 
 class TestRecommendSellOrHold:
     def test_hold_when_future_much_better(self):
-        result = recommend_sell_or_hold(
-            current_net_value=100000,
-            expected_future_net_value=115000,
-            threshold_pct=5.0,
-        )
+        result = recommend_sell_or_hold(100000, 115000, threshold_pct=5.0)
         assert result["recommendation"] == "HOLD"
 
     def test_sell_when_future_much_worse(self):
-        result = recommend_sell_or_hold(
-            current_net_value=100000,
-            expected_future_net_value=85000,
-            threshold_pct=5.0,
-        )
+        result = recommend_sell_or_hold(100000, 85000, threshold_pct=5.0)
         assert result["recommendation"] == "SELL_NOW"
 
     def test_partial_sell_in_middle(self):
-        result = recommend_sell_or_hold(
-            current_net_value=100000,
-            expected_future_net_value=102000,
-            threshold_pct=5.0,
-        )
+        result = recommend_sell_or_hold(100000, 102000, threshold_pct=5.0)
         assert result["recommendation"] == "PARTIAL_SELL"
 
     def test_same_inputs_same_output(self):
-        """Determinism check: same inputs must always produce same output."""
         r1 = recommend_sell_or_hold(100000, 108000, 5.0)
         r2 = recommend_sell_or_hold(100000, 108000, 5.0)
         assert r1 == r2
@@ -110,12 +90,7 @@ class TestRecommendSellOrHold:
 
 class TestCalculatePartialSellStrategy:
     def test_basic(self):
-        result = calculate_partial_sell_strategy(
-            quantity_quintal=40,
-            current_net_value=200000,
-            expected_future_net_value=220000,
-            sell_fraction=0.5,
-        )
+        result = calculate_partial_sell_strategy(40, 200000, 220000, sell_fraction=0.5)
         assert result["sell_now_quantity_quintal"] == 20.0
         assert result["hold_quantity_quintal"] == 20.0
 

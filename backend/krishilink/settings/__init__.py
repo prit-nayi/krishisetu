@@ -1,1 +1,1 @@
-"""Settings package — default to development."""
+"""Settings package."""

@@ -1,9 +1,11 @@
 """
 markets/views.py — Market and MarketPrice API views.
 """
+import math
 from rest_framework import generics, permissions
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Market, MarketPrice
 from .serializers import MarketSerializer, MarketPriceSerializer
@@ -11,87 +13,69 @@ from .serializers import MarketSerializer, MarketPriceSerializer
 
 class MarketListView(generics.ListAPIView):
     """GET /api/v1/markets/ — list all active markets."""
-
-    serializer_class = MarketSerializer
+    queryset           = Market.objects.filter(is_active=True)
+    serializer_class   = MarketSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Market.objects.filter(is_active=True)
-    filterset_fields = ["district", "market_type"]
-    search_fields = ["name", "district"]
+    filter_backends    = [DjangoFilterBackend]
+    filterset_fields   = ["district", "market_type"]
 
 
 class MarketPriceListView(generics.ListAPIView):
-    """GET /api/v1/markets/prices/ — list market prices with filters."""
-
-    serializer_class = MarketPriceSerializer
+    """GET /api/v1/markets/prices/?commodity=groundnut&market=1"""
+    serializer_class   = MarketPriceSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ["commodity", "market", "price_date"]
-    ordering_fields = ["price_date", "modal_price"]
-    ordering = ["-price_date"]
 
     def get_queryset(self):
-        return MarketPrice.objects.select_related("market").all()
+        qs = MarketPrice.objects.select_related("market")
+        commodity = self.request.query_params.get("commodity")
+        market_id = self.request.query_params.get("market")
+        if commodity:
+            qs = qs.filter(commodity__iexact=commodity)
+        if market_id:
+            qs = qs.filter(market_id=market_id)
+        return qs.order_by("-price_date")[:100]
 
 
 class MarketPriceHistoryView(generics.ListAPIView):
-    """
-    GET /api/v1/markets/{market_id}/history/?commodity=cotton&days=90
-    Returns price history for a specific market and commodity.
-    """
-
-    serializer_class = MarketPriceSerializer
+    """GET /api/v1/markets/history/?commodity=groundnut&market=1&days=90"""
+    serializer_class   = MarketPriceSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        from datetime import date, timedelta
-
-        market_id = self.kwargs["market_id"]
-        commodity = self.request.query_params.get("commodity", "cotton")
-        days = int(self.request.query_params.get("days", 90))
-        since = date.today() - timedelta(days=days)
-
-        return MarketPrice.objects.filter(
-            market_id=market_id,
-            commodity=commodity,
-            price_date__gte=since,
-        ).order_by("price_date")
+        from django.utils import timezone
+        from datetime import timedelta
+        commodity = self.request.query_params.get("commodity", "groundnut")
+        market_id = self.request.query_params.get("market")
+        days      = int(self.request.query_params.get("days", 90))
+        since     = timezone.now().date() - timedelta(days=days)
+        qs = MarketPrice.objects.filter(commodity__iexact=commodity, price_date__gte=since)
+        if market_id:
+            qs = qs.filter(market_id=market_id)
+        return qs.order_by("price_date")
 
 
 class NearbyMarketsView(APIView):
-    """
-    GET /api/v1/markets/nearby/?lat=22.5&lon=70.8&radius_km=100&commodity=groundnut
-    Returns active markets sorted by distance from the given coordinates.
-    """
-
+    """GET /api/v1/markets/nearby/?lat=22.16&lon=70.79&radius_km=50&commodity=groundnut"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        import math
+        try:
+            lat       = float(request.query_params.get("lat", 0))
+            lon       = float(request.query_params.get("lon", 0))
+            radius_km = float(request.query_params.get("radius_km", 100))
+            commodity = request.query_params.get("commodity", "")
+        except ValueError:
+            return Response({"error": "Invalid parameters."}, status=400)
 
-        lat = request.query_params.get("lat")
-        lon = request.query_params.get("lon")
-        radius_km = float(request.query_params.get("radius_km", 100))
-        commodity = request.query_params.get("commodity", "")
-
-        if not lat or not lon:
-            return Response(
-                {"error": "lat and lon query parameters are required."},
-                status=400,
-            )
-
-        lat, lon = float(lat), float(lon)
-
-        markets = Market.objects.filter(
-            is_active=True,
-            latitude__isnull=False,
-            longitude__isnull=False,
-        )
-
+        markets = Market.objects.filter(is_active=True)
         results = []
-        for market in markets:
-            distance = _haversine(lat, lon, float(market.latitude), float(market.longitude))
-            if distance <= radius_km:
-                data = MarketSerializer(market).data
-                data["distance_km"] = round(distance, 1)
+        for m in markets:
+            if m.latitude is None or m.longitude is None:
+                continue
+            dist = _haversine(lat, lon, float(m.latitude), float(m.longitude))
+            if dist <= radius_km:
+                data = MarketSerializer(m).data
+                data["distance_km"] = round(dist, 1)
                 results.append(data)
 
         results.sort(key=lambda x: x["distance_km"])
@@ -99,16 +83,10 @@ class NearbyMarketsView(APIView):
 
 
 def _haversine(lat1, lon1, lat2, lon2):
-    """Calculate great-circle distance in km between two lat/lon points."""
-    import math
-
-    R = 6371.0
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(math.radians(lat1))
-        * math.cos(math.radians(lat2))
-        * math.sin(dlon / 2) ** 2
-    )
+    """Return distance in km between two lat/lon points."""
+    R = 6371
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi  = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))

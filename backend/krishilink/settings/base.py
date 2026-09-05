@@ -2,22 +2,13 @@
 Base Django settings shared across all environments.
 """
 from pathlib import Path
-import environ
+from datetime import timedelta
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# ── Environment ───────────────────────────────────────────────────────────────
-env = environ.Env(
-    DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, []),
-)
-environ.Env.read_env(BASE_DIR / ".env")
-
 # ── Core ──────────────────────────────────────────────────────────────────────
-SECRET_KEY = env("SECRET_KEY")
-DEBUG = env("DEBUG")
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+SECRET_KEY = "change-me-to-a-long-random-string"
 
 # ── Application definition ────────────────────────────────────────────────────
 DJANGO_APPS = [
@@ -32,6 +23,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
@@ -88,8 +80,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "krishilink.wsgi.application"
 
 # ── Database ──────────────────────────────────────────────────────────────────
+# Default: SQLite for local development (no Docker required).
+# Override DATABASE_URL in .env to switch to PostgreSQL.
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
 }
 
 # ── Custom User ───────────────────────────────────────────────────────────────
@@ -112,13 +109,27 @@ USE_TZ = True
 # ── Static files ──────────────────────────────────────────────────────────────
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+}
 
 # ── Media files ───────────────────────────────────────────────────────────────
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ── Cache ─────────────────────────────────────────────────────────────────────
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
 
 # ── Django REST Framework ─────────────────────────────────────────────────────
 REST_FRAMEWORK = {
@@ -140,8 +151,6 @@ REST_FRAMEWORK = {
 }
 
 # ── JWT ───────────────────────────────────────────────────────────────────────
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -151,10 +160,12 @@ SIMPLE_JWT = {
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:5173"])
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 # ── Celery ────────────────────────────────────────────────────────────────────
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -171,10 +182,10 @@ SPECTACULAR_SETTINGS = {
 }
 
 # ── IBM Granite ───────────────────────────────────────────────────────────────
-IBM_WATSONX_URL = env("IBM_WATSONX_URL", default="")
-IBM_WATSONX_API_KEY = env("IBM_WATSONX_API_KEY", default="")
-IBM_WATSONX_PROJECT_ID = env("IBM_WATSONX_PROJECT_ID", default="")
-IBM_GRANITE_MODEL_ID = env("IBM_GRANITE_MODEL_ID", default="ibm/granite-13b-instruct-v2")
+IBM_WATSONX_URL = ""
+IBM_WATSONX_API_KEY = ""
+IBM_WATSONX_PROJECT_ID = ""
+IBM_GRANITE_MODEL_ID = "ibm/granite-13b-instruct-v2"
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 LOGGING = {
@@ -182,7 +193,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "format": "{levelname} {asctime} {module} {message}",
             "style": "{",
         },
     },
@@ -197,15 +208,7 @@ LOGGING = {
         "level": "INFO",
     },
     "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "krishilink": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
+        "django": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "krishilink": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
     },
 }

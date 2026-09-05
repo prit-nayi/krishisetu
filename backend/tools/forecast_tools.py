@@ -1,123 +1,101 @@
 """
-tools/forecast_tools.py
-Deterministic forecasting tools for KrishiLink AI.
-Uses linear regression as baseline; SARIMAX added in Phase 5.
+tools/forecast_tools.py — Deterministic price forecasting tools (baseline linear model).
+
+Phase 5 will upgrade to SARIMAX. This baseline uses simple linear regression.
 """
-import math
-from typing import Optional
+import statistics
 
 
-def calculate_price_trend(prices: list) -> dict:
+def calculate_price_trend(price_history: list) -> dict:
     """
-    Fit a simple linear regression on historical prices to determine trend.
+    Fit a simple linear trend to historical modal prices.
 
     Args:
-        prices: List of dicts with 'modal_price' (float), sorted chronologically.
+        price_history: List of dicts with "modal_price". Ordered oldest → newest.
 
     Returns:
-        dict with slope, trend_direction, r_squared, data_points.
+        {"trend_direction": "up"|"down"|"flat", "slope": float,
+         "r_squared": float, "data_points": int}
     """
+    prices = [float(p["modal_price"]) for p in price_history if p.get("modal_price") is not None]
     n = len(prices)
     if n < 3:
-        return {
-            "slope": 0.0,
-            "trend_direction": "insufficient_data",
-            "r_squared": 0.0,
-            "data_points": n,
-        }
+        return {"trend_direction": "flat", "slope": 0.0, "r_squared": 0.0, "data_points": n}
 
-    x = list(range(n))
-    y = [float(p["modal_price"]) for p in prices]
+    x_vals   = list(range(n))
+    x_mean   = statistics.mean(x_vals)
+    y_mean   = statistics.mean(prices)
+    ss_xy    = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_vals, prices))
+    ss_xx    = sum((x - x_mean) ** 2 for x in x_vals)
 
-    x_mean = sum(x) / n
-    y_mean = sum(y) / n
+    slope = ss_xy / ss_xx if ss_xx != 0 else 0.0
 
-    ss_xy = sum((xi - x_mean) * (yi - y_mean) for xi, yi in zip(x, y))
-    ss_xx = sum((xi - x_mean) ** 2 for xi in x)
-    ss_yy = sum((yi - y_mean) ** 2 for yi in y)
+    # R²
+    y_pred  = [y_mean + slope * (x - x_mean) for x in x_vals]
+    ss_res  = sum((y - yp) ** 2 for y, yp in zip(prices, y_pred))
+    ss_tot  = sum((y - y_mean) ** 2 for y in prices)
+    r2      = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0.0
 
-    slope = ss_xy / ss_xx if ss_xx > 0 else 0.0
-    r_squared = (ss_xy ** 2 / (ss_xx * ss_yy)) if (ss_xx > 0 and ss_yy > 0) else 0.0
-
-    if slope > 5:
-        trend_direction = "upward"
-    elif slope < -5:
-        trend_direction = "downward"
-    else:
-        trend_direction = "stable"
-
+    direction = "up" if slope > 5 else ("down" if slope < -5 else "flat")
     return {
-        "slope": round(slope, 4),
-        "slope_per_day": round(slope, 2),
-        "trend_direction": trend_direction,
-        "r_squared": round(r_squared, 4),
+        "trend_direction": direction,
+        "slope": round(slope, 2),
+        "r_squared": round(r2, 4),
         "data_points": n,
-        "latest_price": round(y[-1], 2),
-        "mean_price": round(y_mean, 2),
     }
 
 
-def generate_linear_forecast(
-    prices: list,
+def generate_price_forecast(
+    price_history: list,
     horizon_days: int = 14,
+    model_name: str = "linear_regression",
 ) -> dict:
     """
     Generate a simple linear extrapolation forecast.
 
     Args:
-        prices: List of dicts with 'modal_price', sorted chronologically.
-        horizon_days: Number of days ahead to forecast.
+        price_history: List of dicts with "modal_price". Ordered oldest → newest.
+        horizon_days: Number of days to forecast ahead.
+        model_name: Label for the model used.
 
     Returns:
-        dict with predicted_price, lower_bound, upper_bound, confidence_score,
-        model_name, and daily forecast series.
+        {"predictions": [float], "confidence_band": {"lower": [float], "upper": [float]},
+         "model": str, "model_version": str, "is_mock": bool}
     """
-    trend = calculate_price_trend(prices)
+    prices = [float(p["modal_price"]) for p in price_history if p.get("modal_price") is not None]
+    n = len(prices)
 
-    if trend["trend_direction"] == "insufficient_data":
+    if n < 3:
+        # Not enough data — return flat forecast from last known price
+        last  = prices[-1] if prices else 0.0
+        preds = [last] * horizon_days
         return {
-            "error": "Insufficient price history for forecasting (need at least 3 records).",
-            "model_name": "linear_trend",
-            "model_version": "1.0",
-            "is_mock": True,
+            "predictions": preds,
+            "confidence_band": {"lower": [last * 0.95] * horizon_days, "upper": [last * 1.05] * horizon_days},
+            "model": model_name,
+            "model_version": "1.0.0-baseline",
+            "is_mock": False,
+            "warning": "Insufficient data — flat forecast used.",
         }
 
-    n = len(prices)
-    last_price = float(prices[-1]["modal_price"])
+    # Fit linear trend
+    trend = calculate_price_trend(price_history)
     slope = trend["slope"]
+    last  = prices[-1]
 
-    # Project forward
-    predicted_price = last_price + slope * horizon_days
-
-    # Simple uncertainty band: grows with horizon and inverse R²
-    uncertainty = last_price * 0.03 * (1 + horizon_days / 30) * (1 - trend["r_squared"] * 0.5)
-    lower_bound = max(0, predicted_price - uncertainty)
-    upper_bound = predicted_price + uncertainty
-
-    # Confidence: higher with more data and better R²
-    raw_confidence = min(0.85, 0.3 + (n / 90) * 0.4 + trend["r_squared"] * 0.15)
-    confidence_score = round(raw_confidence, 2)
-
-    # Daily series
-    series = []
-    for day in range(1, horizon_days + 1):
-        price = last_price + slope * day
-        series.append({
-            "day": day,
-            "predicted_price": round(max(0, price), 2),
-        })
+    # Extrapolate
+    preds  = [max(0.0, last + slope * (i + 1)) for i in range(horizon_days)]
+    margin = statistics.stdev(prices) if n > 1 else last * 0.05
+    lower  = [max(0.0, p - 1.96 * margin) for p in preds]
+    upper  = [p + 1.96 * margin for p in preds]
 
     return {
-        "horizon_days": horizon_days,
-        "predicted_price": round(max(0, predicted_price), 2),
-        "lower_bound": round(lower_bound, 2),
-        "upper_bound": round(upper_bound, 2),
-        "confidence_score": confidence_score,
-        "trend_direction": trend["trend_direction"],
-        "slope_per_day": trend["slope_per_day"],
-        "r_squared": trend["r_squared"],
-        "data_points": n,
-        "model_name": "linear_trend",
-        "model_version": "1.0",
-        "daily_series": series,
+        "predictions": [round(p, 2) for p in preds],
+        "confidence_band": {
+            "lower": [round(p, 2) for p in lower],
+            "upper": [round(p, 2) for p in upper],
+        },
+        "model": model_name,
+        "model_version": "1.0.0-baseline",
+        "is_mock": False,
     }
