@@ -11,17 +11,24 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
+from apps.accounts.views import AdminUserListView
+
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
 
     # API v1
-    path("api/v1/auth/",      include("apps.accounts.urls.auth_urls")),
-    path("api/v1/farmer/",    include("apps.accounts.urls.farmer_urls")),
-    path("api/v1/markets/",   include("apps.markets.urls")),
-    path("api/v1/crops/",     include("apps.crops.urls")),
-    path("api/v1/forecast/",  include("apps.forecasting.urls")),
-    path("api/v1/decisions/", include("apps.decisions.urls")),
+    path("api/v1/auth/",        include("apps.accounts.urls.auth_urls")),
+    path("api/v1/farmer/",      include("apps.accounts.urls.farmer_urls")),
+    path("api/v1/buyer/",       include("apps.accounts.urls.buyer_urls")),
+    path("api/v1/admin/users/", AdminUserListView.as_view(), name="admin-user-list"),
+    path("api/v1/markets/",     include("apps.markets.urls")),
+    path("api/v1/crops/",       include("apps.crops.urls")),
+    path("api/v1/forecast/",    include("apps.forecasting.urls")),
+    path("api/v1/decisions/",   include("apps.decisions.urls")),
+    path("api/v1/marketplace/", include("apps.marketplace.urls")),
+    # Phase 4+5 combined analysis endpoint
+    path("api/v1/analysis/",    include("apps.decisions.urls")),
 
     # API schema / docs
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

@@ -32,6 +32,10 @@ class User(AbstractUser):
         return self.role == self.Role.FARMER
 
     @property
+    def is_buyer(self):
+        return self.role == self.Role.BUYER
+
+    @property
     def is_admin_user(self):
         return self.role == self.Role.ADMIN
 
@@ -55,3 +59,26 @@ class FarmerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.email} — {self.village}, {self.district}"
+
+
+class BuyerProfile(models.Model):
+    """Extended profile for buyer/trader users."""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="buyer_profile")
+    company_name = models.CharField(max_length=200, blank=True, null=True)
+    business_type = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. Wholesaler, Processor, Retailer, Trader, Commission Agent")
+    district = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, default="Gujarat")
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    gst_number = models.CharField(max_length=20, blank=True, null=True)
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Buyer Profile"
+        verbose_name_plural = "Buyer Profiles"
+
+    def __str__(self):
+        return f"{self.user.email} — {self.company_name or 'Independent Buyer'}"
+

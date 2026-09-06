@@ -1,5 +1,5 @@
 /**
- * LoginPage.jsx — Phase 1 Authentication UI.
+ * LoginPage.jsx — Multi-Role Login with Instant Hackathon Demo Presets.
  */
 import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
@@ -45,36 +45,51 @@ function isValidEmail(email) {
 }
 
 export default function LoginPage() {
-  const { login }  = useAuth()
-  const navigate   = useNavigate()
-  const location   = useLocation()
-  const from       = location.state?.from?.pathname || '/dashboard'
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/dashboard'
 
-  const [form, setForm]         = useState({ email: '', password: '' })
-  const [errors, setErrors]     = useState({})
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({})
   const [apiError, setApiError] = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
 
   function handleChange(e) {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
-    if (errors[name])  setErrors((prev) => ({ ...prev, [name]: '' }))
-    if (apiError)      setApiError('')
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }))
+    if (apiError) setApiError('')
+  }
+
+  function handleDemoFill(role) {
+    if (role === 'farmer') {
+      setForm({ email: 'farmer_demo@krishilink.in', password: 'Password123!' })
+    } else if (role === 'buyer') {
+      setForm({ email: 'buyer_demo@krishilink.in', password: 'Password123!' })
+    } else if (role === 'admin') {
+      setForm({ email: 'admin_demo@krishilink.in', password: 'Password123!' })
+    }
+    setErrors({})
+    setApiError('')
   }
 
   function validate() {
     const errs = {}
-    if (!form.email.trim())             errs.email    = 'Email is required.'
-    else if (!isValidEmail(form.email)) errs.email    = 'Enter a valid email address.'
-    if (!form.password)                 errs.password = 'Password is required.'
+    if (!form.email.trim()) errs.email = 'Email is required.'
+    else if (!isValidEmail(form.email)) errs.email = 'Enter a valid email address.'
+    if (!form.password) errs.password = 'Password is required.'
     return errs
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     const errs = validate()
-    if (Object.keys(errs).length) { setErrors(errs); return }
+    if (Object.keys(errs).length) {
+      setErrors(errs)
+      return
+    }
     setLoading(true)
     setApiError('')
     try {
@@ -93,11 +108,11 @@ export default function LoginPage() {
         <div className={styles.brand}>
           <div className={styles.brandIcon} aria-hidden="true">🌾</div>
           <div className={styles.brandName}>KrishiLink AI</div>
-          <div className={styles.brandTagline}>Smart market decisions for cotton &amp; groundnut farmers</div>
+          <div className={styles.brandTagline}>Autonomous Agricultural Market Intelligence</div>
         </div>
 
-        <h1 className={styles.heading}>Welcome back</h1>
-        <p className={styles.subheading}>Sign in to your farmer account</p>
+        <h1 className={styles.heading}>Sign In</h1>
+        <p className={styles.subheading}>Access farmer intelligence &amp; buyer marketplace</p>
 
         {apiError && (
           <div className={`${styles.alert} ${styles.alertError}`} role="alert">
@@ -109,17 +124,22 @@ export default function LoginPage() {
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           {/* Email */}
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="email">Email address</label>
+            <label className={styles.label} htmlFor="email">Email Address</label>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconEmail /></span>
               <input
-                id="email" name="email" type="email"
-                autoComplete="email" autoFocus
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                autoFocus
                 placeholder="you@example.com"
-                value={form.email} onChange={handleChange}
+                value={form.email}
+                onChange={handleChange}
                 className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
                 aria-describedby={errors.email ? 'email-error' : undefined}
-                aria-invalid={!!errors.email} disabled={loading}
+                aria-invalid={!!errors.email}
+                disabled={loading}
               />
             </div>
             {errors.email && (
@@ -135,18 +155,24 @@ export default function LoginPage() {
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconLock /></span>
               <input
-                id="password" name="password"
+                id="password"
+                name="password"
                 type={showPass ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="Your password"
-                value={form.password} onChange={handleChange}
+                value={form.password}
+                onChange={handleChange}
                 className={`${styles.input} ${styles.inputPassword} ${errors.password ? styles.inputError : ''}`}
                 aria-describedby={errors.password ? 'password-error' : undefined}
-                aria-invalid={!!errors.password} disabled={loading}
+                aria-invalid={!!errors.password}
+                disabled={loading}
               />
-              <button type="button" className={styles.inputToggle}
+              <button
+                type="button"
+                className={styles.inputToggle}
                 onClick={() => setShowPass((v) => !v)}
-                aria-label={showPass ? 'Hide password' : 'Show password'}>
+                aria-label={showPass ? 'Hide password' : 'Show password'}
+              >
                 {showPass ? <IconEyeOff /> : <IconEye />}
               </button>
             </div>
@@ -159,9 +185,25 @@ export default function LoginPage() {
 
           <button type="submit" className={styles.submitBtn} disabled={loading} aria-busy={loading}>
             {loading && <span className={styles.spinner} aria-hidden="true" />}
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? 'Authenticating…' : 'Sign In'}
           </button>
         </form>
+
+        {/* Demo Quick Logins for Hackathon Judges */}
+        <div className={styles.demoBox}>
+          <span className={styles.demoTitle}>⚡ Instant Demo Credentials</span>
+          <div className={styles.demoButtons}>
+            <button type="button" onClick={() => handleDemoFill('farmer')} className={styles.demoBtn}>
+              🌾 Farmer
+            </button>
+            <button type="button" onClick={() => handleDemoFill('buyer')} className={styles.demoBtn}>
+              🏢 Buyer
+            </button>
+            <button type="button" onClick={() => handleDemoFill('admin')} className={styles.demoBtn}>
+              🛡️ Admin
+            </button>
+          </div>
+        </div>
 
         <p className={styles.footer}>
           Don&apos;t have an account?{' '}

@@ -1,71 +1,104 @@
 /**
- * global.css — KrishiLink AI global reset and CSS custom properties.
- * Imported once in main.jsx as a plain stylesheet (not a CSS Module).
- * No Tailwind. All component styles use CSS Modules.
+ * global.css — KrishiLink AI Futuristic Glassmorphism Design System.
+ * Dark luxury palette, vibrant neon emerald & cyan glowing accents,
+ * blurred glass cards, responsive grid, and modern typography.
  */
 
 :root {
-  --clr-primary:        #2e7d32;
-  --clr-primary-hover:  #43a047;
-  --clr-primary-tint:   #e8f5e9;
-  --clr-primary-dark:   #1b5e20;
+  /* Core Theme Colors */
+  --bg-space: #070b12;
+  --bg-deep: #0b1320;
+  --bg-card: rgba(15, 23, 42, 0.72);
+  --bg-card-hover: rgba(22, 33, 58, 0.85);
+  --bg-glass-input: rgba(11, 19, 32, 0.65);
+  --border-glass: rgba(255, 255, 255, 0.09);
+  --border-glass-glow: rgba(16, 185, 129, 0.35);
 
-  --clr-secondary:      #e65100;
-  --clr-secondary-hover:#ff6d00;
-  --clr-secondary-tint: #fff3e0;
+  /* Neon Accents */
+  --clr-emerald: #10b981;
+  --clr-emerald-glow: rgba(16, 185, 129, 0.28);
+  --clr-emerald-dark: #065f46;
+  --clr-cyan: #06b6d4;
+  --clr-cyan-glow: rgba(6, 182, 212, 0.28);
+  --clr-cyan-dark: #155e75;
+  --clr-amber: #f59e0b;
+  --clr-amber-glow: rgba(245, 158, 11, 0.28);
+  --clr-rose: #f43f5e;
+  --clr-rose-glow: rgba(244, 63, 94, 0.28);
+  --clr-purple: #8b5cf6;
+  --clr-purple-glow: rgba(139, 92, 246, 0.28);
 
-  --clr-bg:             #f4f6f4;
-  --clr-surface:        #ffffff;
-  --clr-surface-raised: #f9fbf9;
-  --clr-border:         #d8e4d8;
-  --clr-border-focus:   #43a047;
+  /* Semantic mappings for backward compatibility */
+  --clr-primary: #10b981;
+  --clr-primary-hover: #34d399;
+  --clr-primary-tint: rgba(16, 185, 129, 0.12);
+  --clr-primary-dark: #065f46;
 
-  --clr-text:           #1b2d1b;
-  --clr-text-muted:     #5a6b5a;
-  --clr-text-inverse:   #ffffff;
+  --clr-secondary: #06b6d4;
+  --clr-secondary-hover: #38bdf8;
+  --clr-secondary-tint: rgba(6, 182, 212, 0.12);
 
-  --clr-error:          #c62828;
-  --clr-error-tint:     #ffebee;
-  --clr-success:        #2e7d32;
-  --clr-success-tint:   #e8f5e9;
-  --clr-warning:        #e65100;
-  --clr-warning-tint:   #fff3e0;
+  --clr-bg: var(--bg-space);
+  --clr-surface: var(--bg-card);
+  --clr-surface-raised: var(--bg-card-hover);
+  --clr-border: var(--border-glass);
+  --clr-border-focus: var(--clr-emerald);
 
-  --font-family:        -apple-system, "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
-  --font-size-xs:       0.75rem;
-  --font-size-sm:       0.875rem;
-  --font-size-base:     0.9375rem;
-  --font-size-md:       1rem;
-  --font-size-lg:       1.125rem;
-  --font-size-xl:       1.25rem;
-  --font-size-2xl:      1.5rem;
-  --font-size-3xl:      1.875rem;
-  --line-height:        1.6;
+  --clr-text: #f8fafc;
+  --clr-text-muted: #94a3b8;
+  --clr-text-secondary: #cbd5e1;
+  --clr-text-inverse: #070b12;
 
-  --sp-1:  0.25rem;
-  --sp-2:  0.5rem;
-  --sp-3:  0.75rem;
-  --sp-4:  1rem;
-  --sp-5:  1.25rem;
-  --sp-6:  1.5rem;
-  --sp-8:  2rem;
+  --clr-error: var(--clr-rose);
+  --clr-error-tint: rgba(244, 63, 94, 0.12);
+  --clr-success: var(--clr-emerald);
+  --clr-success-tint: rgba(16, 185, 129, 0.12);
+  --clr-warning: var(--clr-amber);
+  --clr-warning-tint: rgba(245, 158, 11, 0.12);
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 0.95rem;
+  --font-size-md: 1.05rem;
+  --font-size-lg: 1.15rem;
+  --font-size-xl: 1.35rem;
+  --font-size-2xl: 1.65rem;
+  --font-size-3xl: 2.15rem;
+  --font-size-4xl: 2.75rem;
+  --line-height: 1.6;
+
+  /* Spacing */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
   --sp-10: 2.5rem;
   --sp-12: 3rem;
   --sp-16: 4rem;
 
-  --radius-sm:   4px;
-  --radius:      8px;
-  --radius-md:   10px;
-  --radius-lg:   14px;
-  --radius-xl:   20px;
+  /* Border Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
-  --shadow:    0 1px 4px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  /* Glass Shadows & Glows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.25);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --shadow-md: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --shadow-emerald: 0 0 24px var(--clr-emerald-glow);
+  --shadow-cyan: 0 0 24px var(--clr-cyan-glow);
 
-  --transition: 0.18s ease;
+  --transition: 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 *, *::before, *::after {
@@ -77,6 +110,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  background-color: var(--bg-space);
+  color-scheme: dark;
 }
 
 body {
@@ -84,30 +119,266 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height);
   color: var(--clr-text);
-  background-color: var(--clr-bg);
+  background: radial-gradient(circle at 15% 15%, #0f2038 0%, #070b12 60%),
+              radial-gradient(circle at 85% 85%, #0d2822 0%, #070b12 70%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-img, svg { display: block; max-width: 100%; }
+img, svg {
+  display: block;
+  max-width: 100%;
+}
 
-a { color: var(--clr-primary); text-decoration: none; }
-a:hover { color: var(--clr-primary-hover); text-decoration: underline; }
+a {
+  color: var(--clr-primary-hover);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+a:hover {
+  color: #6ee7b7;
+  text-decoration: none;
+}
 
-button { cursor: pointer; font-family: inherit; border: none; background: none; }
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: inherit;
+}
 
-input, textarea, select { font-family: inherit; font-size: inherit; }
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--clr-text);
+  background-color: var(--bg-glass-input);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 1rem;
+  transition: all var(--transition);
+}
 
-ul, ol { list-style: none; }
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--clr-emerald);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  background-color: rgba(15, 23, 42, 0.9);
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ── Global Glass & Glow Utilities ────────────────────────────────────────── */
+
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.glass-panel-hover {
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+.glass-panel-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: var(--shadow-md), 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.glow-border-emerald {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.2) !important;
+}
+
+.glow-border-cyan {
+  border-color: rgba(6, 182, 212, 0.45) !important;
+  box-shadow: 0 0 24px rgba(6, 182, 212, 0.2) !important;
+}
+
+.glow-border-amber {
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* ── Pill Badges ─────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-rose {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.badge-purple {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.badge-glass {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--clr-text-secondary);
+  border: 1px solid var(--border-glass);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all var(--transition);
+  cursor: pointer;
+  text-decoration: none !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-cyan {
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+}
+.btn-cyan:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #06b6d4 100%);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--clr-text);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(10px);
+}
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+.btn-danger:hover {
+  background: rgba(244, 63, 94, 0.25);
+  border-color: #f43f5e;
+}
+
+/* ── Animated Pulse Dot ─────────────────────────────────────────────────── */
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+.pulse-dot-emerald {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+.pulse-dot-cyan {
+  background: #06b6d4;
+  box-shadow: 0 0 10px #06b6d4;
+}
+
+/* ── Screen Layout Container ────────────────────────────────────────────── */
+
+.kl-app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.kl-main-content {
+  flex: 1;
+  padding: var(--sp-6) var(--sp-8);
+  max-width: 1380px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .kl-main-content {
+    padding: var(--sp-4);
+  }
+}
 
 .kl-loading-screen {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  gap: var(--sp-3);
-  color: var(--clr-text-muted);
+  gap: var(--sp-4);
+  color: var(--clr-text-secondary);
   font-size: var(--font-size-md);
+}
+
+.kl-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(16, 185, 129, 0.2);
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: kl-spin 0.8s linear infinite;
+}
+
+@keyframes kl-spin {
+  to { transform: rotate(360deg); }
 }
 
 .sr-only {

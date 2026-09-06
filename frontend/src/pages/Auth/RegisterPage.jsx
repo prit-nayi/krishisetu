@@ -1,5 +1,5 @@
 /**
- * RegisterPage.jsx — Phase 1 Registration UI.
+ * RegisterPage.jsx — Multi-Role Registration UI (Farmer or Buyer).
  */
 import React, { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -68,12 +68,13 @@ const STRENGTH_CLASS = [styles.strengthWeak, styles.strengthFair, styles.strengt
 
 export default function RegisterPage() {
   const { register } = useAuth()
-  const navigate      = useNavigate()
+  const navigate = useNavigate()
 
-  const [form, setForm]     = useState({ username:'', email:'', phone:'', password:'', password_confirm:'' })
+  const [role, setRole] = useState('farmer') // 'farmer' | 'buyer'
+  const [form, setForm] = useState({ username: '', email: '', phone: '', password: '', password_confirm: '' })
   const [errors, setErrors] = useState({})
   const [apiError, setApiError] = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
@@ -88,15 +89,15 @@ export default function RegisterPage() {
 
   function validate() {
     const errs = {}
-    if (!form.username.trim())           errs.username = 'Username is required.'
+    if (!form.username.trim()) errs.username = 'Username is required.'
     else if (form.username.trim().length < 3) errs.username = 'At least 3 characters.'
-    else if (/\s/.test(form.username))   errs.username = 'No spaces allowed.'
-    if (!form.email.trim())              errs.email = 'Email is required.'
-    else if (!isValidEmail(form.email))  errs.email = 'Enter a valid email address.'
+    else if (/\s/.test(form.username)) errs.username = 'No spaces allowed.'
+    if (!form.email.trim()) errs.email = 'Email is required.'
+    else if (!isValidEmail(form.email)) errs.email = 'Enter a valid email address.'
     if (form.phone.trim() && !isValidPhone(form.phone)) errs.phone = 'Enter a valid phone number.'
-    if (!form.password)                  errs.password = 'Password is required.'
-    else if (form.password.length < 8)   errs.password = 'At least 8 characters required.'
-    if (!form.password_confirm)          errs.password_confirm = 'Please confirm your password.'
+    if (!form.password) errs.password = 'Password is required.'
+    else if (form.password.length < 8) errs.password = 'At least 8 characters required.'
+    if (!form.password_confirm) errs.password_confirm = 'Please confirm your password.'
     else if (form.password !== form.password_confirm) errs.password_confirm = 'Passwords do not match.'
     return errs
   }
@@ -113,7 +114,7 @@ export default function RegisterPage() {
         email: form.email.trim(),
         password: form.password,
         password_confirm: form.password_confirm,
-        role: 'farmer',
+        role: role,
       }
       if (form.phone.trim()) payload.phone = form.phone.trim()
       await register(payload)
@@ -131,11 +132,31 @@ export default function RegisterPage() {
         <div className={styles.brand}>
           <div className={styles.brandIcon} aria-hidden="true">🌾</div>
           <div className={styles.brandName}>KrishiLink AI</div>
-          <div className={styles.brandTagline}>Smart market decisions for cotton &amp; groundnut farmers</div>
+          <div className={styles.brandTagline}>Autonomous Agricultural Market Intelligence</div>
         </div>
 
-        <h1 className={styles.heading}>Create your account</h1>
-        <p className={styles.subheading}>Free for farmers. No credit card required.</p>
+        <h1 className={styles.heading}>Create Account</h1>
+        <p className={styles.subheading}>Select your role to get started</p>
+
+        {/* Role Selector Tabs */}
+        <div className={styles.roleSelector}>
+          <button
+            type="button"
+            className={`${styles.roleOption} ${role === 'farmer' ? styles.roleOptionActive : ''}`}
+            onClick={() => setRole('farmer')}
+          >
+            <span style={{ fontSize: '1.25rem' }}>🌾</span>
+            <span>Farmer</span>
+          </button>
+          <button
+            type="button"
+            className={`${styles.roleOption} ${role === 'buyer' ? styles.roleOptionBuyerActive : ''}`}
+            onClick={() => setRole('buyer')}
+          >
+            <span style={{ fontSize: '1.25rem' }}>🏢</span>
+            <span>Buyer / Trader</span>
+          </button>
+        </div>
 
         {apiError && (
           <div className={`${styles.alert} ${styles.alertError}`} role="alert">
@@ -150,25 +171,42 @@ export default function RegisterPage() {
             <label className={styles.label} htmlFor="username">Username</label>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconUser /></span>
-              <input id="username" name="username" type="text" autoComplete="username" autoFocus
-                placeholder="e.g. ramesh_patel" value={form.username} onChange={handleChange}
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                autoFocus
+                placeholder={role === 'farmer' ? 'e.g. ramesh_patel' : 'e.g. gujarat_agro_traders'}
+                value={form.username}
+                onChange={handleChange}
                 className={`${styles.input} ${errors.username ? styles.inputError : ''}`}
                 aria-describedby={errors.username ? 'username-error' : undefined}
-                aria-invalid={!!errors.username} disabled={loading} />
+                aria-invalid={!!errors.username}
+                disabled={loading}
+              />
             </div>
             {errors.username && <span id="username-error" className={styles.fieldError} role="alert"><IconAlert /> {errors.username}</span>}
           </div>
 
           {/* Email */}
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="reg-email">Email address</label>
+            <label className={styles.label} htmlFor="reg-email">Email Address</label>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconEmail /></span>
-              <input id="reg-email" name="email" type="email" autoComplete="email"
-                placeholder="you@example.com" value={form.email} onChange={handleChange}
+              <input
+                id="reg-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={handleChange}
                 className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
                 aria-describedby={errors.email ? 'reg-email-error' : undefined}
-                aria-invalid={!!errors.email} disabled={loading} />
+                aria-invalid={!!errors.email}
+                disabled={loading}
+              />
             </div>
             {errors.email && <span id="reg-email-error" className={styles.fieldError} role="alert"><IconAlert /> {errors.email}</span>}
           </div>
@@ -176,15 +214,23 @@ export default function RegisterPage() {
           {/* Phone */}
           <div className={styles.field}>
             <label className={styles.label} htmlFor="phone">
-              Phone number <span className={styles.labelOptional}>(optional)</span>
+              Phone Number <span style={{ textTransform: 'lowercase', opacity: 0.7 }}>(optional)</span>
             </label>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconPhone /></span>
-              <input id="phone" name="phone" type="tel" autoComplete="tel"
-                placeholder="+91 98765 43210" value={form.phone} onChange={handleChange}
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                placeholder="+91 98765 43210"
+                value={form.phone}
+                onChange={handleChange}
                 className={`${styles.input} ${errors.phone ? styles.inputError : ''}`}
                 aria-describedby={errors.phone ? 'phone-error' : undefined}
-                aria-invalid={!!errors.phone} disabled={loading} />
+                aria-invalid={!!errors.phone}
+                disabled={loading}
+              />
             </div>
             {errors.phone && <span id="phone-error" className={styles.fieldError} role="alert"><IconAlert /> {errors.phone}</span>}
           </div>
@@ -194,14 +240,24 @@ export default function RegisterPage() {
             <label className={styles.label} htmlFor="reg-password">Password</label>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconLock /></span>
-              <input id="reg-password" name="password"
-                type={showPass ? 'text' : 'password'} autoComplete="new-password"
-                placeholder="At least 8 characters" value={form.password} onChange={handleChange}
+              <input
+                id="reg-password"
+                name="password"
+                type={showPass ? 'text' : 'password'}
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+                value={form.password}
+                onChange={handleChange}
                 className={`${styles.input} ${styles.inputPassword} ${errors.password ? styles.inputError : ''}`}
-                aria-invalid={!!errors.password} disabled={loading} />
-              <button type="button" className={styles.inputToggle}
+                aria-invalid={!!errors.password}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className={styles.inputToggle}
                 onClick={() => setShowPass((v) => !v)}
-                aria-label={showPass ? 'Hide password' : 'Show password'}>
+                aria-label={showPass ? 'Hide password' : 'Show password'}
+              >
                 {showPass ? <IconEyeOff /> : <IconEye />}
               </button>
             </div>
@@ -218,17 +274,27 @@ export default function RegisterPage() {
 
           {/* Confirm password */}
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="password-confirm">Confirm password</label>
+            <label className={styles.label} htmlFor="password-confirm">Confirm Password</label>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}><IconLock /></span>
-              <input id="password-confirm" name="password_confirm"
-                type={showConfirm ? 'text' : 'password'} autoComplete="new-password"
-                placeholder="Re-enter your password" value={form.password_confirm} onChange={handleChange}
+              <input
+                id="password-confirm"
+                name="password_confirm"
+                type={showConfirm ? 'text' : 'password'}
+                autoComplete="new-password"
+                placeholder="Re-enter your password"
+                value={form.password_confirm}
+                onChange={handleChange}
                 className={`${styles.input} ${styles.inputPassword} ${errors.password_confirm ? styles.inputError : ''}`}
-                aria-invalid={!!errors.password_confirm} disabled={loading} />
-              <button type="button" className={styles.inputToggle}
+                aria-invalid={!!errors.password_confirm}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className={styles.inputToggle}
                 onClick={() => setShowConfirm((v) => !v)}
-                aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              >
                 {showConfirm ? <IconEyeOff /> : <IconEye />}
               </button>
             </div>
@@ -237,14 +303,12 @@ export default function RegisterPage() {
 
           <button type="submit" className={styles.submitBtn} disabled={loading} aria-busy={loading}>
             {loading && <span className={styles.spinner} aria-hidden="true" />}
-            {loading ? 'Creating account…' : 'Create free account'}
+            {loading ? 'Creating Account…' : `Register as ${role === 'farmer' ? 'Farmer' : 'Buyer'}`}
           </button>
-
-          <p className={styles.terms}>By registering you agree to KrishiLink AI&apos;s terms of service.</p>
         </form>
 
         <p className={styles.footer}>
-          Already have an account? <Link to="/login">Sign in</Link>
+          Already have an account? <Link to="/login">Sign In</Link>
         </p>
       </div>
     </div>
