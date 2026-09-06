@@ -1,0 +1,243 @@
+/**
+ * Market.module.css — Market list and price pages (Phase 3).
+ * Uses CSS custom properties from global.css.
+ * No Tailwind.
+ */
+
+/* ── Page shell ──────────────────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  background: var(--clr-bg);
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-8);
+  height: 56px;
+  background: var(--clr-surface);
+  border-bottom: 1px solid var(--clr-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.navBrand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 700;
+  font-size: var(--font-size-md);
+  color: var(--clr-primary-dark);
+  text-decoration: none;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.navLink {
+  font-size: var(--font-size-sm);
+  color: var(--clr-text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.navLink:hover { color: var(--clr-primary); }
+
+.navLogout {
+  font-size: var(--font-size-sm);
+  color: var(--clr-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.navLogout:hover { color: var(--clr-error); }
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.header {
+  background: linear-gradient(135deg, var(--clr-primary-dark) 0%, var(--clr-primary) 100%);
+  color: #fff;
+  padding: var(--sp-8) var(--sp-8) var(--sp-6);
+}
+
+.header h1 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.header p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
+}
+
+/* ── Main content ────────────────────────────────────────────────────────── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-8);
+}
+
+/* ── Filter bar ──────────────────────────────────────────────────────────── */
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-4);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.filterGroup label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filterSelect,
+.filterInput {
+  height: 36px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-sm);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  font-size: var(--font-size-sm);
+  min-width: 140px;
+}
+
+.filterSelect:focus,
+.filterInput:focus {
+  outline: none;
+  border-color: var(--clr-primary);
+}
+
+/* ── Status messages ─────────────────────────────────────────────────────── */
+.loading,
+.empty {
+  text-align: center;
+  padding: var(--sp-12) var(--sp-8);
+  color: var(--clr-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.error {
+  padding: var(--sp-4);
+  border-radius: var(--radius-md);
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: var(--clr-error);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--sp-4);
+}
+
+/* ── Price table ─────────────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table thead {
+  background: var(--clr-bg);
+}
+
+.table th {
+  padding: var(--sp-3) var(--sp-4);
+  text-align: left;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--clr-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--clr-border);
+  color: var(--clr-text);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: var(--clr-primary-tint);
+}
+
+/* ── Price cells ─────────────────────────────────────────────────────────── */
+.priceMin { color: var(--clr-text-muted); }
+.priceMax { color: var(--clr-text-muted); }
+.priceModal {
+  font-weight: 700;
+  color: var(--clr-primary-dark);
+}
+
+/* ── Commodity badge ─────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeGroundnut {
+  background: var(--clr-secondary-tint, #fff3e0);
+  color: var(--clr-secondary, #e65100);
+}
+
+.badgeCotton {
+  background: var(--clr-primary-tint);
+  color: var(--clr-primary-dark);
+}
+
+/* ── Source tag ──────────────────────────────────────────────────────────── */
+.sourceTag {
+  font-size: var(--font-size-xs);
+  color: var(--clr-text-muted);
+}
+
+/* ── Section title ───────────────────────────────────────────────────────── */
+.sectionTitle {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--clr-text);
+  margin: 0 0 var(--sp-4);
+}
+
+.resultCount {
+  font-size: var(--font-size-xs);
+  color: var(--clr-text-muted);
+  margin-bottom: var(--sp-3);
+}

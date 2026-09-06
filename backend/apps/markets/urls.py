@@ -1,12 +1,19 @@
 """
-markets/urls.py
+markets/urls.py — Phase 3 URL patterns.
 """
 from django.urls import path
-from .views import MarketListView, MarketPriceListView, MarketPriceHistoryView, NearbyMarketsView
+from .views import (
+    MarketListView,
+    MarketDetailView,
+    MarketPriceListView,
+    MarketPriceHistoryView,
+    NearbyMarketsView,
+)
 
 urlpatterns = [
-    path("",        MarketListView.as_view(),        name="market-list"),
-    path("prices/", MarketPriceListView.as_view(),   name="market-prices"),
-    path("history/",MarketPriceHistoryView.as_view(),name="market-history"),
-    path("nearby/", NearbyMarketsView.as_view(),     name="market-nearby"),
+    path("",              MarketListView.as_view(),        name="market-list"),
+    path("<int:pk>/",     MarketDetailView.as_view(),      name="market-detail"),
+    path("prices/",       MarketPriceListView.as_view(),   name="market-prices"),
+    path("history/",      MarketPriceHistoryView.as_view(),name="market-history"),
+    path("nearby/",       NearbyMarketsView.as_view(),     name="market-nearby"),
 ]
