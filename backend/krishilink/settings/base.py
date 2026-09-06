@@ -3,6 +3,12 @@ Base Django settings shared across all environments.
 """
 from pathlib import Path
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+
+# Load .env from the backend directory (one level above this settings package).
+# This must happen before any os.environ.get() calls below.
+load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -186,6 +192,9 @@ IBM_WATSONX_URL = ""
 IBM_WATSONX_API_KEY = ""
 IBM_WATSONX_PROJECT_ID = ""
 IBM_GRANITE_MODEL_ID = "ibm/granite-13b-instruct-v2"
+
+# ── Market Data (Phase 3) ─────────────────────────────────────────────────────
+DATA_GOV_API_KEY = os.environ.get("DATA_GOV_API_KEY", "")
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 LOGGING = {
