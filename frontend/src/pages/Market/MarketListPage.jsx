@@ -5,8 +5,9 @@
  * Reads from the KrishiLink backend (PostgreSQL) — never directly from data.gov.in.
  */
 import React, { useState, useEffect, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import Navbar from '../../components/Navigation/Navbar'
 import {
   fetchMarketPrices,
   fetchMarketPriceHistory,
@@ -70,24 +71,9 @@ export default function MarketListPage() {
 
   useEffect(() => { loadPrices() }, [loadPrices])
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login')
-  }
-
   return (
     <div className={styles.page}>
-      {/* Navigation */}
-      <nav className={styles.nav}>
-        <Link to="/dashboard" className={styles.navBrand}>
-          <span>🌾</span> KrishiLink AI
-        </Link>
-        <div className={styles.navActions}>
-          <Link to="/dashboard"   className={styles.navLink}>Dashboard</Link>
-          <Link to="/crop-lots"   className={styles.navLink}>My Lots</Link>
-          <button onClick={handleLogout} className={styles.navLogout}>Logout</button>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Header */}
       <header className={styles.header}>

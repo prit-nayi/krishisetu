@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '../../context/AuthContext'
+import Navbar from '../../components/Navigation/Navbar'
 import { fetchCropLot, updateCropLot, parseApiError } from '../../api/cropLots'
 import styles from './CropLot.module.css'
 
@@ -124,19 +124,7 @@ export default function CropLotDetailPage() {
   /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className={styles.page}>
-      {/* Nav */}
-      <nav className={styles.nav}>
-        <Link to="/dashboard" className={styles.navBrand}>
-          <span className={styles.navLogo} aria-hidden="true">🌾</span>
-          KrishiLink AI
-        </Link>
-        <div className={styles.navActions}>
-          <Link to="/farmer/profile" className={styles.navLink}><IconUser /> Profile</Link>
-          <button onClick={handleLogout} className={styles.navLogout} aria-label="Log out">
-            <IconLogout /> Log out
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className={styles.main}>
         {/* Header */}

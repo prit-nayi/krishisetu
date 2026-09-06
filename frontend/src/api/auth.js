@@ -33,6 +33,21 @@ export async function updateFarmerProfile(payload) {
   return data
 }
 
+export async function fetchBuyerProfile() {
+  const { data } = await axiosClient.get('/buyer/profile/')
+  return data
+}
+
+export async function updateBuyerProfile(payload) {
+  const { data } = await axiosClient.patch('/buyer/profile/', payload)
+  return data
+}
+
+export async function fetchAdminUsers() {
+  const { data } = await axiosClient.get('/admin/users/')
+  return data
+}
+
 /**
  * Extract a human-readable error message from an Axios error response.
  */

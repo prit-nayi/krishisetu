@@ -17,6 +17,8 @@ const IconCheck = () => (
   </svg>
 )
 
+import Navbar from '../../components/Navigation/Navbar'
+
 export default function FarmerProfilePage() {
   const { user } = useAuth()
   const [form, setForm] = useState({ district:'', taluka:'', village:'', pincode:'', latitude:'', longitude:'' })
@@ -84,9 +86,9 @@ export default function FarmerProfilePage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.card}>
-          <div className={styles.skeleton} />
-          <div className={styles.skeleton} style={{ width:'60%', marginTop:'1rem' }} />
+        <Navbar />
+        <div className="kl-loading-screen">
+          <div className="kl-spinner" />
         </div>
       </div>
     )
@@ -94,8 +96,10 @@ export default function FarmerProfilePage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.cardHeader}>
+      <Navbar />
+      <div style={{ maxWidth: '640px', margin: '2rem auto', width: '100%', padding: '0 1rem' }}>
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
           <div className={styles.avatar} aria-hidden="true">
             {user?.username?.[0]?.toUpperCase() || '🌾'}
           </div>
@@ -164,6 +168,7 @@ export default function FarmerProfilePage() {
             {saving ? 'Saving…' : 'Save profile'}
           </button>
         </form>
+        </div>
       </div>
     </div>
   )

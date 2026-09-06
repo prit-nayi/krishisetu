@@ -6,18 +6,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import FarmerProfile
+from .models import User, FarmerProfile, BuyerProfile
 from .serializers import (
     UserRegistrationSerializer,
     UserSerializer,
     CustomTokenObtainPairSerializer,
     FarmerProfileSerializer,
     FarmerProfileCreateSerializer,
+    BuyerProfileSerializer,
+    BuyerProfileCreateSerializer,
 )
+from apps.common.permissions import IsAdminUser
 
 
 class RegisterView(generics.CreateAPIView):
-    """POST /api/v1/auth/register/ — create a new farmer user."""
+    """POST /api/v1/auth/register/ — create a new user (farmer or buyer)."""
 
     serializer_class   = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
@@ -66,3 +69,34 @@ class FarmerProfileView(generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         kwargs["partial"] = True
         return super().update(request, *args, **kwargs)
+
+
+class BuyerProfileView(generics.RetrieveUpdateAPIView):
+    """GET/PATCH /api/v1/buyer/profile/ — retrieve or update own buyer profile."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method in ("PUT", "PATCH"):
+            return BuyerProfileCreateSerializer
+        return BuyerProfileSerializer
+
+    def get_object(self):
+        profile, _ = BuyerProfile.objects.get_or_create(
+            user=self.request.user,
+            defaults={"company_name": "", "district": ""},
+        )
+        return profile
+
+    def update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return super().update(request, *args, **kwargs)
+
+
+class AdminUserListView(generics.ListAPIView):
+    """GET /api/v1/admin/users/ — list all registered users (Admin only)."""
+
+    permission_classes = [IsAdminUser]
+    serializer_class   = UserSerializer
+    queryset           = User.objects.all().order_by("-date_joined")
+

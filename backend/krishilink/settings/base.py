@@ -46,6 +46,7 @@ LOCAL_APPS = [
     "apps.decisions",
     "apps.agents",
     "apps.common",
+    "apps.marketplace",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -188,10 +189,12 @@ SPECTACULAR_SETTINGS = {
 }
 
 # ── IBM Granite ───────────────────────────────────────────────────────────────
-IBM_WATSONX_URL = ""
-IBM_WATSONX_API_KEY = ""
-IBM_WATSONX_PROJECT_ID = ""
-IBM_GRANITE_MODEL_ID = "ibm/granite-13b-instruct-v2"
+IBM_WATSONX_URL = os.environ.get("IBM_WATSONX_URL", "")
+IBM_WATSONX_API_KEY = os.environ.get("IBM_WATSONX_API_KEY", "")
+IBM_WATSONX_PROJECT_ID = os.environ.get("IBM_WATSONX_PROJECT_ID", "")
+IBM_GRANITE_MODEL_ID = os.environ.get("IBM_GRANITE_MODEL_ID", "ibm/granite-13b-instruct-v2")
+IBM_GRANITE_MODE = os.environ.get("IBM_GRANITE_MODE", "mock")
+AI_DEMO_MODE = os.environ.get("AI_DEMO_MODE", "true").lower() in ("true", "1", "yes")
 
 # ── Market Data (Phase 3) ─────────────────────────────────────────────────────
 DATA_GOV_API_KEY = os.environ.get("DATA_GOV_API_KEY", "")

@@ -2,25 +2,20 @@
  * CropLotListPage.jsx — List all active crop lots with edit and delete.
  */
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '../../context/AuthContext'
+import Navbar from '../../components/Navigation/Navbar'
+import StatusBadge from '../../components/UI/StatusBadge'
 import { fetchCropLots, deleteCropLot, parseApiError } from '../../api/cropLots'
 import styles from './CropLot.module.css'
 
 /* ── Icons ────────────────────────────────────────────────────────────────── */
 const IconPlus    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+const IconChart   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
 const IconEdit    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
 const IconTrash   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-const IconBack    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-const IconUser    = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-const IconLogout  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
 
 /* ── Helpers ──────────────────────────────────────────────────────────────── */
-function commodityBadgeClass(commodity) {
-  return commodity === 'cotton' ? styles.badgeCotton : styles.badgeGroundnut
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -56,11 +51,9 @@ function DeleteModal({ lot, onConfirm, onCancel, isDeleting }) {
 
 /* ── Main page ────────────────────────────────────────────────────────────── */
 export default function CropLotListPage() {
-  const { user, logout } = useAuth()
-  const navigate         = useNavigate()
-  const queryClient      = useQueryClient()
+  const queryClient = useQueryClient()
 
-  const [deletingLot, setDeletingLot] = useState(null) // lot object pending delete
+  const [deletingLot, setDeletingLot] = useState(null)
   const [deleteError, setDeleteError] = useState('')
 
   /* fetch */
@@ -92,34 +85,16 @@ export default function CropLotListPage() {
     deleteMutation.mutate(deletingLot.id)
   }
 
-  function handleLogout() {
-    logout()
-    navigate('/login', { replace: true })
-  }
-
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className={styles.page}>
-      {/* Nav */}
-      <nav className={styles.nav}>
-        <Link to="/dashboard" className={styles.navBrand}>
-          <span className={styles.navLogo} aria-hidden="true">🌾</span>
-          KrishiLink AI
-        </Link>
-        <div className={styles.navActions}>
-          <Link to="/farmer/profile" className={styles.navLink}><IconUser /> Profile</Link>
-          <button onClick={handleLogout} className={styles.navLogout} aria-label="Log out">
-            <IconLogout /> Log out
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className={styles.main}>
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerText}>
             <h1>My Crop Lots</h1>
-            <p>Manage your cotton and groundnut lots</p>
+            <p>Manage your cotton and groundnut lots registered for AI market intelligence</p>
           </div>
           <Link to="/crop-lots/new" className={styles.btnPrimary}>
             <IconPlus /> Add new lot
@@ -163,14 +138,10 @@ export default function CropLotListPage() {
                 <div className={styles.lotCardTop}>
                   <div className={styles.lotCardInfo}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <span className={styles.lotCardTitle}>{lot.commodity_display}</span>
-                      <span className={`${styles.badge} ${commodityBadgeClass(lot.commodity)}`}>
-                        {lot.commodity}
-                      </span>
+                      <span className={styles.lotCardTitle}>{lot.commodity_display || lot.commodity}</span>
+                      <StatusBadge status={lot.commodity} />
                       {lot.quality_grade && (
-                        <span className={`${styles.badge} ${styles.badgeStorage}`}>
-                          Grade {lot.quality_grade}
-                        </span>
+                        <StatusBadge status={lot.quality_grade} label={`Grade ${lot.quality_grade}`} />
                       )}
                     </div>
                     <div className={styles.lotCardMeta}>
@@ -189,6 +160,14 @@ export default function CropLotListPage() {
                   </div>
 
                   <div className={styles.lotCardActions}>
+                    <Link
+                      to={`/analysis/${lot.id}`}
+                      className={styles.btnPrimary}
+                      style={{ padding: '6px 14px', fontSize: '0.8125rem' }}
+                      aria-label={`Analyze market and price forecast for ${lot.commodity_display} lot`}
+                    >
+                      <IconChart /> AI Analyze
+                    </Link>
                     <Link
                       to={`/crop-lots/${lot.id}/edit`}
                       className={styles.btnEdit}

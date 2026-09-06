@@ -6,15 +6,20 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute, PublicRoute } from './components/ProtectedRoute'
 
-const LoginPage      = React.lazy(() => import('./pages/Auth/LoginPage'))
-const RegisterPage   = React.lazy(() => import('./pages/Auth/RegisterPage'))
+const LoginPage         = React.lazy(() => import('./pages/Auth/LoginPage'))
+const RegisterPage      = React.lazy(() => import('./pages/Auth/RegisterPage'))
 const FarmerProfilePage = React.lazy(() => import('./pages/FarmerProfile/FarmerProfilePage'))
-const DashboardPage  = React.lazy(() => import('./pages/Dashboard/DashboardPage'))
+const BuyerProfilePage  = React.lazy(() => import('./pages/BuyerProfile/BuyerProfilePage'))
+const DashboardPage     = React.lazy(() => import('./pages/Dashboard/DashboardPage'))
 const CropLotListPage   = React.lazy(() => import('./pages/CropLot/CropLotListPage'))
 const CropLotCreatePage = React.lazy(() => import('./pages/CropLot/CropLotCreatePage'))
 const CropLotDetailPage = React.lazy(() => import('./pages/CropLot/CropLotDetailPage'))
-const AnalysisPage   = React.lazy(() => import('./pages/Analysis/AnalysisPage'))
-const MarketListPage = React.lazy(() => import('./pages/Market/MarketListPage'))
+const AnalysisPage      = React.lazy(() => import('./pages/Analysis/AnalysisPage'))
+const MarketListPage    = React.lazy(() => import('./pages/Market/MarketListPage'))
+const MarketplacePage   = React.lazy(() => import('./pages/Marketplace/MarketplacePage'))
+const MyListingsPage    = React.lazy(() => import('./pages/Marketplace/MyListingsPage'))
+const InquiriesPage     = React.lazy(() => import('./pages/Marketplace/InquiriesPage'))
+const AdminUsersPage    = React.lazy(() => import('./pages/Admin/AdminUsersPage'))
 
 function App() {
   return (
@@ -23,7 +28,8 @@ function App() {
         <React.Suspense
           fallback={
             <div className="kl-loading-screen" role="status" aria-live="polite">
-              Loading…
+              <div className="kl-spinner" />
+              <p>Loading KrishiLink AI…</p>
             </div>
           }
         >
@@ -31,13 +37,23 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login"    element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+
             <Route path="/dashboard"       element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/farmer/profile"  element={<ProtectedRoute><FarmerProfilePage /></ProtectedRoute>} />
+            <Route path="/buyer/profile"   element={<ProtectedRoute><BuyerProfilePage /></ProtectedRoute>} />
+
             <Route path="/crop-lots"           element={<ProtectedRoute><CropLotListPage /></ProtectedRoute>} />
             <Route path="/crop-lots/new"       element={<ProtectedRoute><CropLotCreatePage /></ProtectedRoute>} />
             <Route path="/crop-lots/:id/edit"  element={<ProtectedRoute><CropLotDetailPage /></ProtectedRoute>} />
             <Route path="/analysis/:cropLotId" element={<ProtectedRoute><AnalysisPage /></ProtectedRoute>} />
-            <Route path="/markets"         element={<ProtectedRoute><MarketListPage /></ProtectedRoute>} />
+
+            <Route path="/marketplace"             element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
+            <Route path="/marketplace/my-listings" element={<ProtectedRoute><MyListingsPage /></ProtectedRoute>} />
+            <Route path="/marketplace/inquiries"   element={<ProtectedRoute><InquiriesPage /></ProtectedRoute>} />
+
+            <Route path="/markets"     element={<ProtectedRoute><MarketListPage /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
+
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </React.Suspense>
