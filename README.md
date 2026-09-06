@@ -1,302 +1,273 @@
-# KrishiLink AI — AI Agent Project Instructions
+# KrishiLink AI
 
-## 1. Project Identity
+KrishiLink AI is a full-stack agri-market intelligence platform for Gujarat farmers, buyers, and administrators. It helps farmers compare markets, estimate realistic net value for crop lots, forecast price movements, and receive SELL/HOLD/PARTIAL SELL recommendations backed by structured market analysis and AI explanations.
 
-**Project:** KrishiLink AI  
-**Purpose:** AI-Powered Cotton & Groundnut Market Linkage and Decision-Intelligence Platform  
-**Target:** Gujarat Hackathon 2026  
-**Primary region:** Gujarat, with initial focus on Saurashtra / North Gujarat  
-**Primary users:** Farmers, Buyers, Admin/Regulator  
-**AI platform requirement:** IBM Granite + IBM Bob / agentic workflow + IBM Cloud
+## Overview
 
-## 2. Core Problem
+The platform combines:
+- a Django REST API for authentication, crop lot management, market intelligence, pricing, forecasting, and decision logic
+- a React + Vite frontend for farmer and buyer workflows
+- role-based access for farmers, buyers, and admins
+- direct crop marketplace and inquiry flow
+- deterministic financial calculations and AI-style explanation layer
 
-Cotton and groundnut farmers often lack timely, trustworthy market intelligence and bargaining power. They may know the current price but still make poor selling decisions because they do not know:
-- Which nearby market gives the best NET value after transport costs.
-- Whether prices are likely to rise or fall in the short term.
-- Whether storing the crop is financially worthwhile.
-- How crop quality affects expected value.
-- Which buyers are suitable for their crop lot.
-- How weather/storage risk changes the decision.
+## Project Goals
 
-**Core promise:** Do not merely show farmers prices. Determine the best economic action for their crop lot and clearly explain why.
+- help farmers choose the best mandi or buyer option for their crop lot
+- compare current market value with transport and storage costs
+- generate short-term crop price forecasts using historical market data
+- recommend whether to sell now, hold, or partially sell
+- provide transparent AI explanations grounded in structured numbers
+- support regional market intelligence for Gujarat commodities, especially cotton and groundnut
 
-## 3. Golden MVP User Journey
+## Current Features
 
-1. Farmer registers/logs in.
-2. Farmer creates a crop lot.
-3. Farmer selects Cotton or Groundnut.
-4. Farmer enters quantity, location and available quality information.
-5. System obtains current market data.
-6. System compares relevant markets.
-7. System calculates transportation and net selling value.
-8. System analyzes historical price movement.
-9. System generates a short-term price forecast.
-10. System calculates whether selling now or holding is financially better.
-11. System produces SELL / HOLD / PARTIAL SELL recommendation.
-12. IBM Granite explains the recommendation in simple language.
-13. Farmer sees the result on a polished dashboard.
+### Farmer and account features
+- JWT-based authentication and registration
+- farmer profile creation and update
+- crop lot creation, edit, list, and deletion
+- commodity support for cotton and groundnut
+- ownership-scoped access to farmer data
 
-**This end-to-end flow is the highest priority.**
+### Market intelligence
+- market listing and market detail APIs
+- price and history endpoints for commodity pricing
+- nearby market lookup and ranking
+- Gujarat APMC market seed data with coordinate metadata
+- commodity normalization and market data sync support
 
-## 4. 80/20 MVP Principle
+### Financial and forecasting engine
+- transport cost estimation
+- revenue and net value calculations
+- forecast confidence and market trend analysis
+- SELL / HOLD / PARTIAL SELL recommendation rules
+- recommendation persistence and retrieval
 
-Do NOT implement the entire commercial platform initially.
+### Marketplace and buyer workflow
+- direct crop listing marketplace
+- buyer inquiry flows
+- accept/reject listing decisions
+- stats dashboard for marketplace activity
 
-### MVP MUST HAVE
+### AI explanation layer
+- mock/demo Granite-style explanation support
+- structured decision reasoning connected to computed outputs
+- explanation service designed for future IBM Watsonx/Granite integration
 
-**Farmer**
-- Registration/login
-- Farmer profile
-- Crop-lot creation/listing
-- Cotton and Groundnut support
-
-**Market Intelligence**
-- Current mandi prices
-- Min/Max/Modal price
-- Arrival quantity where available
-- Historical price data
-- Nearby market discovery
-- Market comparison
-
-**Financial Intelligence**
-- Transport-cost calculation
-- Current gross revenue
-- Net revenue
-- Storage-cost calculation
-- Expected future value
-- Basic ROI/net-benefit calculation
-
-**Forecasting**
-- Price trend
-- Short-term forecast
-- Confidence/uncertainty indicator
-- Baseline model plus one stronger statistical/ML model
-
-**Decision**
-- SELL NOW
-- HOLD
-- PARTIAL SELL
-- Evidence-backed recommendation
-- Explicit reason/factors
-
-**IBM Granite**
-- Natural-language intent understanding
-- Tool selection where needed
-- Final explanation
-- Gujarati/Hindi/English-ready architecture
-- Granite must not invent numerical market values
-
-**UI**
-- Farmer dashboard
-- Crop analysis page
-- Price charts
-- Market comparison table
-- Recommendation card
-- AI explanation card
-
-## 5. Post-MVP Roadmap
-
-### Phase 2 — Advanced Intelligence
-- Quality & Valuation Agent
-- Detailed crop grading
-- Weather & Risk Agent
-- Spoilage/storage risk
-- Better forecasting
-- Price anomaly detection
-
-### Phase 3 — Buyer Marketplace
-- Buyer registration/profile
-- Buyer requirements
-- Verified buyers
-- Buyer matching
-- Offer submission
-- Buyer ranking
-- Deal-room foundation
-- Digital deal slip
-
-### Phase 4 — Trust, Logistics & Traceability
-- Buyer trust score
-- Fraud/anomaly detection
-- Advanced transport optimization
-- QR crop-lot traceability
-- Farm-to-buyer history
-
-### Phase 5 — Ecosystem
-- Government scheme matching
-- MSP/procurement-window intelligence
-- Indicative inventory financing
-- Buyer demand analytics
-- Regulator dashboard
-
-### Phase 6 — Scale & Accessibility
-- Gujarati/Hindi voice interface
-- WhatsApp integration
-- SMS/IVR
-- Offline-first support
-- More crops
-- More districts/APMCs
-- Production-scale optimization
-
-## 6. Final Technology Stack
-
-### Frontend
-- React
-- Vite
-- JavaScript
-- React Query
-- Axios
-- CSS Modules
-- Recharts
-- Leaflet
-
-Do NOT use Tailwind unless explicitly requested.
+## Tech Stack
 
 ### Backend
-- Django
+- Python 3.11
+- Django 4.2
 - Django REST Framework
-- Django ORM
 - JWT authentication
-- DRF serializers/viewsets/routers
-- Django Admin
+- Celery + Redis
+- SQLite for local development
+- PostgreSQL-ready configuration for production
 
-### Database
-- PostgreSQL
-- PostGIS
+### Frontend
+- React 18
+- Vite
+- JavaScript
+- React Router
+- React Query
+- Axios
+- Recharts
+- Leaflet / React Leaflet
 
-### Background processing
-- Celery
-- Redis
-
-Use Celery for long-running ML/agent jobs. Do not unnecessarily introduce asynchronous infrastructure for simple CRUD operations.
-
-### Data / ML
-- Python
+### Data and ML
 - Pandas
 - NumPy
-- Scikit-learn
-- Statsmodels
-- XGBoost or LightGBM where useful
+- scikit-learn
+- statsmodels
+- xgboost
 
-### AI
-- IBM Granite
-- IBM Bob / permitted IBM agentic orchestration
-- IBM Cloud
+## Repository Structure
 
-### External data
-- Agmarknet / appropriate government market-data source
-- Weather API when Weather/Risk phase is implemented
+```text
+krishisetu/
+├── backend/
+│   ├── apps/
+│   │   ├── accounts/
+│   │   ├── agents/
+│   │   ├── common/
+│   │   ├── crops/
+│   │   ├── decisions/
+│   │   ├── forecasting/
+│   │   ├── markets/
+│   │   └── marketplace/
+│   ├── krishilink/
+│   ├── tests/
+│   ├── tools/
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── db.sqlite3
+├── frontend/
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.js
+├── architecture.md
+├── project_status.md
+├── README.md
+├── Gujarat APMC_data/
+├── KrishiLink_AI_Complete_System_Specification.pdf
+└── .gitignore
+```
 
-### DevOps
-- Git
-- GitHub
-- Docker
-- IBM Cloud
+## Local Development Setup
 
-## 7. Critical AI Architecture Principle
+### 1. Clone and open the project
 
-**LLM for reasoning and language. Python for computation. PostgreSQL for data. Agents for orchestration.**
+```bash
+git clone <repository-url>
+cd krishisetu
+```
 
-NEVER make Granite perform deterministic calculations that the backend can perform.
+### 2. Create and activate a virtual environment
 
-Preferred flow:
+On Windows PowerShell:
 
-`User -> Agent/Orchestrator -> deterministic tools -> structured JSON -> Granite explanation`
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
 
-## 8. Token-Efficient Tool Architecture
+On macOS/Linux:
 
-Create deterministic Python tools.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-### Market
-- get_latest_market_price()
-- get_market_price_history()
-- get_market_arrivals()
-- get_nearby_markets()
-- compare_market_prices()
-- calculate_price_change()
-- detect_price_anomaly()
+### 3. Install backend dependencies
 
-### Forecast
-- generate_price_forecast()
-- get_forecast_confidence()
-- calculate_price_trend()
+```bash
+cd backend
+pip install -r requirements.txt
+```
 
-### Financial
-- calculate_transport_cost()
-- calculate_market_revenue()
-- calculate_storage_cost()
-- calculate_capital_cost()
-- calculate_expected_future_value()
-- calculate_net_profit()
-- calculate_roi()
-- recommend_sell_or_hold()
-- calculate_partial_sell_strategy()
+### 4. Configure environment variables
 
-### Farmer
-- get_farmer_profile()
-- get_farmer_inventory()
-- get_crop_lot()
-- create_crop_lot()
-- update_crop_lot()
+Create a `.env` file inside the `backend` folder if needed for local settings and AI credentials.
 
-### Quality
-- calculate_quality_score()
-- calculate_quality_grade()
-- estimate_quality_price_adjustment()
+Example:
 
-### Buyer
-- search_buyers()
-- filter_buyers()
-- rank_buyers()
-- calculate_buyer_trust_score()
+```env
+DATA_GOV_API_KEY=your_key_here
+IBM_WATSONX_URL=
+IBM_WATSONX_API_KEY=
+IBM_WATSONX_PROJECT_ID=
+IBM_GRANITE_MODEL_ID=ibm/granite-13b-instruct-v2
+IBM_GRANITE_MODE=mock
+AI_DEMO_MODE=true
+```
 
-### Risk
-- get_weather()
-- calculate_weather_risk()
-- calculate_spoilage_risk()
+### 5. Run database migrations
 
-### Logistics
-- calculate_distance()
-- estimate_transport_cost()
-- find_nearest_market()
-- optimize_delivery_route()
+```bash
+cd backend
+python manage.py migrate
+```
 
-## 9. Tool Design Rules
+### 6. Seed demo data (optional but recommended)
 
-Every tool must:
-1. Have one clear responsibility.
-2. Accept structured input.
-3. Return structured JSON/dictionary output.
-4. Validate inputs.
-5. Never depend on free-form LLM-generated code.
-6. Never expose secrets.
-7. Be independently unit-testable.
-8. Return evidence/source timestamps where relevant.
-9. Fail safely.
-10. Have a clear description.
+```bash
+python manage.py seed_demo_data
+```
 
-Do NOT expose all tools to every agent. Use agent-specific toolsets.
+This creates sample users such as farmer, buyer, and admin accounts plus demo crop lots and marketplace records.
 
-## 10. Agent Architecture
+## Run the app
 
-### MVP
-Keep the architecture lean.
+### Backend
 
-1. **Orchestrator / Decision Coordinator** — determines required tools/workflow.
-2. **Market Intelligence Agent/Service** — current prices, history, comparison.
-3. **Forecast Agent/Service** — trends and forecasts.
-4. **Financial Decision Agent/Service** — transport, storage, net value, SELL/HOLD/PARTIAL SELL.
-5. **Granite Advisory Agent** — farmer-friendly explanation.
+```bash
+cd backend
+python manage.py runserver 0.0.0.0:8000
+```
 
-The system may internally use Python services/tools instead of making every component an LLM-powered autonomous agent.
+API base URL:
+- http://localhost:8000/api/v1/
 
-### Post-MVP agents
-- Quality & Valuation Agent
-- Weather & Risk Agent
-- Buyer Matching Agent
-- Logistics Agent
-- Fraud & Trust Agent
-- Government Scheme Agent
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend dev server:
+- http://localhost:5173
+
+## Key API Areas
+
+The backend exposes the main API endpoints under `/api/v1/`:
+
+- Auth: register, login, refresh, me
+- Farmer profile: profile management
+- Crop lots: create/list/update/delete crop lots
+- Markets: markets, prices, history, nearby markets
+- Forecasting: forecast information and decision support
+- Decisions: analysis and recommendation endpoints
+- Marketplace: listings, inquiries, and buyer flows
+
+## Demo Accounts
+
+When demo data is seeded, common sample accounts include:
+- Farmer: `farmer_demo@krishilink.in`
+- Buyer: `buyer_demo@krishilink.in`
+- Admin: `admin_demo@krishilink.in`
+
+Password:
+- `Password123!`
+
+## Project Status
+
+This repository is a working MVP-style implementation with the following completed areas:
+- authentication and role-based access
+- farmer and buyer profiles
+- crop lot management
+- market intelligence for Gujarat commodity data
+- pricing and analysis logic
+- forecasting and recommendation engine
+- direct crop marketplace workflow
+- React frontend for user-facing interactions
+
+The project status and more detailed progress are tracked in [project_status.md](project_status.md).
+
+## Important Notes
+
+- The project is designed for local development with SQLite by default.
+- IBM Granite integrations are set up with a demo/mock mode by default to allow local development without external credentials.
+- The app is tailored to Gujarat agriculture use cases, especially cotton and groundnut market decisions.
+- If you want to enable real market sync or AI capabilities, add valid env variables and configure the related providers.
+
+## Useful commands
+
+```bash
+# backend migrations
+cd backend
+python manage.py migrate
+
+# backend tests
+python manage.py test
+
+# optional: create superuser
+python manage.py createsuperuser
+
+# frontend build
+cd frontend
+npm run build
+```
+
+## License
+
+This project is for internal/demo use unless a separate license is added by the project owner.
+
+## Contributing
+
+For local development, keep updates aligned with the current structure and avoid breaking the role-based flow and decision engine logic. Documentation and project status are maintained across the repo, including [architecture.md](architecture.md) and [project_status.md](project_status.md).
 
 ## 11. Final Decision Engine
 
